@@ -90,7 +90,7 @@ public class InquisitionServiceImpl implements InquisitionService {
                 ).isEmpty()
         ) {
             step = 2;
-        } else if (process.getFinishDate() == null) {
+        } else if (process.getFinishData() == null) {
             step = 3;
         } else {
             step = 4;

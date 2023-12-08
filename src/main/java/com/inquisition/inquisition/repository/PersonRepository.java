@@ -54,7 +54,10 @@ public class PersonRepository implements CrudRepository<Person> {
 
     @Override
     public List<Person> findAll(Condition condition) {
-        return null;
+        return dsl.selectFrom(PERSON)
+                .where(condition)
+                .fetch()
+                .map(personRecordMapper::map);
     }
 
     @Override

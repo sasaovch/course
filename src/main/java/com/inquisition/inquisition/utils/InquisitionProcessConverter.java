@@ -17,8 +17,8 @@ public class InquisitionProcessConverter {
 
     public static InquisitionProcessPayload convertToPayload(InquisitionProcess process, Integer countCases) {
         InquisitionProcessPayload payload = new InquisitionProcessPayload();
-        payload.setStartTime(process.getStartDate());
-        payload.setEndTime(process.getFinishDate());
+        payload.setStartTime(process.getStartData());
+        payload.setEndTime(process.getFinishData());
         Person person = process.getOfficial().getPerson();
         if (person != null) {
             payload.setInquisitor(person.getName() + " " + person.getSurname());
@@ -26,6 +26,7 @@ public class InquisitionProcessConverter {
             payload.setInquisitor("");
         }
         payload.setCaseCount(countCases);
+        payload.setLocality(process.getChurch().getLocality().getName());
         return payload;
     }
 }

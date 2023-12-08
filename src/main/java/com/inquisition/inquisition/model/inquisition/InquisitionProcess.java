@@ -38,10 +38,10 @@ public class InquisitionProcess {
     private Integer id;
 //
 //    @Column(name = "start_data", nullable = false)
-    private LocalDate startDate;
+    private LocalDate startData;
 //
 //    @Column(name = "finish_data")
-    private LocalDate finishDate;
+    private LocalDate finishData;
 //
 //    @ManyToOne
 //    @JoinColumn(name = "official_id", nullable = false)
