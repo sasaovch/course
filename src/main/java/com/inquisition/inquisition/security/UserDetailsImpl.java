@@ -14,16 +14,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class UserDetailsImpl implements UserDetails {
     private static final long serialVersionUID = 1L;
 
-    private Long id;
+    private final Integer id;
 
-    private String username;
+    private final String username;
 
     @JsonIgnore
-    private String password;
+    private final String password;
 
-    private GrantedAuthority authority;
+    private final GrantedAuthority authority;
 
-    public UserDetailsImpl(Long id, String username, String password,
+    public UserDetailsImpl(Integer id, String username, String password,
                            GrantedAuthority authority) {
         this.id = id;
         this.username = username;
@@ -50,7 +50,7 @@ public class UserDetailsImpl implements UserDetails {
         return authority;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 

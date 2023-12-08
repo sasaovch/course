@@ -12,52 +12,61 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import lombok.Data;
 
-@Entity(name = "locality")
+//public record Locality(
+//        Integer id,
+//        String name,
+//        LocalDate foundationDate
+//) {
+//}
+//
+//@Entity(name = "locality")
+@Data
 public class Locality {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
-    @Column(nullable = false)
+//
+//    @Column(nullable = false)
     private String name;
-
-    @Column(name = "foundation_date")
+//
+//    @Column(name = "foundation_date")
     private LocalDate foundationDate;
-
-    @OneToMany(mappedBy = "locality", cascade = CascadeType.REMOVE)
-    private List<Church> churches;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public LocalDate getFoundationDate() {
-        return foundationDate;
-    }
-
-    public void setFoundationDate(LocalDate foundationDate) {
-        this.foundationDate = foundationDate;
-    }
-
-    public List<Church> getChurches() {
-        return churches;
-    }
-
-    public void setChurches(List<Church> churches) {
-        this.churches = churches;
-    }
+//
+//    @OneToMany(mappedBy = "locality", cascade = CascadeType.REMOVE)
+//    private List<Church> churches;
+//
+//    public Integer getId() {
+//        return id;
+//    }
+//
+//    public void setId(Integer id) {
+//        this.id = id;
+//    }
+//
+//    public String getName() {
+//        return name;
+//    }
+//
+//    public void setName(String name) {
+//        this.name = name;
+//    }
+//
+//    public LocalDate getFoundationDate() {
+//        return foundationDate;
+//    }
+//
+//    public void setFoundationDate(LocalDate foundationDate) {
+//        this.foundationDate = foundationDate;
+//    }
+//
+//    public List<Church> getChurches() {
+//        return churches;
+//    }
+//
+//    public void setChurches(List<Church> churches) {
+//        this.churches = churches;
+//    }
 }

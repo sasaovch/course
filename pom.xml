@@ -81,11 +81,13 @@
 			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
+
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
@@ -101,6 +103,25 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.jooq/jooq -->
+		<dependency>
+			<groupId>org.jooq</groupId>
+			<artifactId>jooq</artifactId>
+			<version>3.18.7</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.jooq/jooq-codegen -->
+		<dependency>
+			<groupId>org.jooq</groupId>
+			<artifactId>jooq-codegen</artifactId>
+			<version>3.18.7</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.jooq/jooq-meta -->
+		<dependency>
+			<groupId>org.jooq</groupId>
+			<artifactId>jooq-meta</artifactId>
+			<version>3.18.7</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -108,6 +129,46 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<!-- JOOQ Generator Plugin -->
+			<plugin>
+				<groupId>org.jooq</groupId>
+				<artifactId>jooq-codegen-maven</artifactId>
+				<version>${jooq.version}</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<jdbc>  <!-- указываем настройки базы -->
+						<driver>org.postgresql.Driver</driver>
+						<url>jdbc:postgresql://localhost:5432/inquisition</url>
+						<user>yt</user>
+						<password>yt</password>
+					</jdbc>
+					<generator>
+						<database>
+							<includes>.*</includes>  <!-- включаемые подпакеты и файлы -->
+							<excludes>  <!-- исключаемые подпакеты и файлы -->
+								flyway_schema_history
+							</excludes>
+							<inputSchema>public</inputSchema>  <!-- схема -->
+						</database>
+						<generate>
+							<records>true</records>
+						</generate>
+						<target>
+							<!-- структура пакетов относительно основной директории -->
+							<packageName>com.inquisition.inquisition.models</packageName>
+							<!-- основная директория. Лучше хранить в target. -->
+							<directory>target/generated-sources/jooq</directory>
+						</target>
+					</generator>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

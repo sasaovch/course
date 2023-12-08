@@ -1,6 +1,10 @@
 package com.inquisition.inquisition.model.payload;
 
-public abstract class PayloadWithData<T> implements Payload {
+import lombok.Data;
+import lombok.Getter;
+
+@Getter
+public class PayloadWithData<T> implements Payload {
     private final Integer code;
     private final String message;
     private final T data;

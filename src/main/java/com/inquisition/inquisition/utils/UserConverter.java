@@ -14,6 +14,6 @@ public class UserConverter {
     }
 
     public static UserDTO convertToUserDTO(User user) {
-        return new UserDTO(user.getUsername(), user.getRole());
+        return new UserDTO(user.getUsername(), user.getRole(), "");
     }
 }

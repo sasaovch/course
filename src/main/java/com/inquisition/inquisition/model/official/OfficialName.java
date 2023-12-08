@@ -3,10 +3,10 @@ package com.inquisition.inquisition.model.official;
 import com.inquisition.inquisition.model.person.Gender;
 
 public enum OfficialName {
-    Bishop("Bishop", 0),
-    SecularAuthority("SecularAuthority", 1),
-    Inquisitor("Inquisitor", 2),
-    Fiscal("Fiscal", 3);
+    BISHOP("Bishop", 0),
+    SECULAR_AUTHORITY("SecularAuthority", 1),
+    INQUISITOR("Inquisitor", 2),
+    FISCAL("Fiscal", 3);
 //'Епископ', 'Светская власть', 'Инквизитор', 'Фискал')
     private final String displayName;
     private final Integer id;

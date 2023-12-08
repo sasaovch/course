@@ -2,6 +2,9 @@ package com.inquisition.inquisition.model.payload;
 
 import java.util.Collection;
 
+import lombok.Getter;
+
+@Getter
 public class PayloadWithCollection<T> implements Payload {
     private final Integer code;
     private final String message;

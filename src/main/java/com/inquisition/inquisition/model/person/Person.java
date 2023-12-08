@@ -15,21 +15,21 @@ import jakarta.persistence.OneToOne;
 import lombok.Data;
 
 @Data
-@Entity(name = "person")
+//@Entity(name = "person")
 public class Person {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column
+//    @Column
     private String name;
-    @Column
+//    @Column
     private String surname;
-    @Column
+//    @Column
     private LocalDate birthDate;
-    @Enumerated(EnumType.STRING)
-    @Column(name = "person_gender")
+//    @Enumerated(EnumType.STRING)
+//    @Column(name = "person_gender")
     private Gender gender;
-    @OneToOne
-    @JoinColumn(name = "locality_id", nullable = false)
-    private Locality locality;
+//    @OneToOne
+//    @JoinColumn(name = "locality_id", nullable = false)
+    private Integer localityId;
 }

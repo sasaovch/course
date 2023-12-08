@@ -1,4 +1,4 @@
-package com.inquisition.inquisition.service;
+package com.inquisition.inquisition.service.intr;
 
 import java.util.List;
 
@@ -10,6 +10,6 @@ import com.inquisition.inquisition.model.payload.Payload;
 public interface InquisitionService {
     Payload startProcess(InquisitionProcessStartContainer container);
     Payload getCurrentInquisitionProcess(Integer localityId);
-    Payload getAllInquisitionProcess(Integer localityId);
-    Payload getAllAccusationRecords(Long inquisitionId);
+    Payload getAllInquisitionProcess();
+//    Payload getAllAccusationRecords(Integer inquisitionId);
 }

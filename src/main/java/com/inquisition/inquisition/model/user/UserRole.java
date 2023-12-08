@@ -1,5 +1,5 @@
 package com.inquisition.inquisition.model.user;
 
 public enum UserRole {
-    Bishop, SecularAuthority, Inquisitor, Fiscal, User
+    BISHOP, SECULAR_AUTHORITY, INQUISITOR, FISCAL, USER
 }

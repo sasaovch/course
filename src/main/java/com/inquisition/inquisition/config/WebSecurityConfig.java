@@ -22,9 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableMethodSecurity
 public class WebSecurityConfig {
-    final
-    UserDetailsServiceImpl userDetailsService;
-
+    private final UserDetailsServiceImpl userDetailsService;
     private final AuthEntryPointJwt unauthorizedHandler;
     @Autowired
     public WebSecurityConfig(UserDetailsServiceImpl userDetailsService, AuthEntryPointJwt unauthorizedHandler) {
@@ -64,11 +62,13 @@ public class WebSecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth
-                                .requestMatchers("/inquisitions/**").permitAll()
-                                .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers("/**").permitAll()
 //                                .requestMatchers("/inquisitions/**").permitAll()
-                                .requestMatchers("/bibles/**").permitAll()
-                                .anyRequest().authenticated()
+//                                .requestMatchers("/api/auth/**").permitAll()
+//                                .requestMatchers("/localities/**").permitAll()
+//                                .requestMatchers("/bibles/**").permitAll()
+//                                .requestMatchers("/bibles/**").permitAll()
+//                                .anyRequest().authenticated()
                 );
 
         http.authenticationProvider(authenticationProvider());
