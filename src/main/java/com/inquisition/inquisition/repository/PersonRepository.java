@@ -3,10 +3,9 @@ package com.inquisition.inquisition.repository;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.inquisition.inquisition.mapper.person.PersonRecordUnmapper;
+import com.inquisition.inquisition.mapper.person.PersonRecordMapper;
 import com.inquisition.inquisition.model.person.Gender;
 import com.inquisition.inquisition.model.person.Person;
-import com.inquisition.inquisition.mapper.person.PersonRecordMapper;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -15,32 +14,19 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
-public class PersonRepository implements CrudRepository<Person> {
+public class PersonRepository {
     private final DSLContext dsl;
     private final PersonRecordMapper personRecordMapper;
-    private final PersonRecordUnmapper personRecordUnmapper;
     private static final com.inquisition.inquisition.models.tables.Person PERSON =
             com.inquisition.inquisition.models.tables.Person.PERSON;
 
     @Autowired
-    public PersonRepository(DSLContext dsl, PersonRecordMapper personRecordMapper, PersonRecordUnmapper personRecordUnmapper) {
+    public PersonRepository(DSLContext dsl, PersonRecordMapper personRecordMapper) {
         this.dsl = dsl;
         this.personRecordMapper = personRecordMapper;
-        this.personRecordUnmapper = personRecordUnmapper;
     }
 
-
-    @Override
-    public Person insert(Person person) {
-        return null;
-    }
-
-    @Override
-    public Person update(Person person) {
-        return null;
-    }
-
-    @Override
+    @Transactional(readOnly = true)
     public Person find(Integer id) {
         return dsl.selectFrom(PERSON)
                 .where(PERSON.ID.eq(id))
@@ -48,6 +34,7 @@ public class PersonRepository implements CrudRepository<Person> {
                 .map(personRecordMapper::map)
                 .orElse(null);
     }
+
     @Transactional(readOnly = true)
     public Person findByCondition(Condition condition) {
         return dsl.selectFrom(PERSON)
@@ -57,17 +44,12 @@ public class PersonRepository implements CrudRepository<Person> {
                 .orElse(null);
     }
 
-    @Override
+    @Transactional(readOnly = true)
     public List<Person> findAll(Condition condition) {
         return dsl.selectFrom(PERSON)
                 .where(condition)
                 .fetch()
                 .map(personRecordMapper::map);
-    }
-
-    @Override
-    public Boolean delete(Integer id) {
-        return null;
     }
 
     public static Condition allFieldsExceptId(
@@ -87,14 +69,7 @@ public class PersonRepository implements CrudRepository<Person> {
                 .and(PERSON.LOCALITY_ID.eq(localityId));
     }
 
-    public static Condition byLocalityId(
-            Integer localityId
-    ) {
-        return DSL
-                .condition(PERSON.LOCALITY_ID.eq(localityId));
+    public static Condition byLocalityId(Integer localityId) {
+        return DSL.condition(PERSON.LOCALITY_ID.eq(localityId));
     }
 }
-//    Optional<Person> findByNameAndSurnameAndBirthDateAndGenderAndLocalityId(
-//            String name, String surname, LocalDate birthDate, Gender gender, Integer localityId
-//    );
-//}

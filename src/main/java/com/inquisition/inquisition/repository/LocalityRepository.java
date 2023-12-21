@@ -24,14 +24,14 @@ public class LocalityRepository {
         LOCALITY = com.inquisition.inquisition.models.tables.Locality.LOCALITY;
     }
 
-    public Locality insert(Locality locality) {
-        return dsl.insertInto(LOCALITY)
-                .set(dsl.newRecord(LOCALITY, locality))
-                .returning()
-                .fetchOptional()
-                .orElseThrow(() -> new DataAccessException("Error inserting entity: " + locality.getId()))
-                .into(Locality.class);
-    }
+//    public Locality insert(Locality locality) {
+//        return dsl.insertInto(LOCALITY)
+//                .set(dsl.newRecord(LOCALITY, locality))
+//                .returning()
+//                .fetchOptional()
+//                .orElseThrow(() -> new DataAccessException("Error inserting entity: " + locality.getId()))
+//                .into(Locality.class);
+//    }
 
     @Transactional(readOnly = true)
     public Locality findByName(String name) {

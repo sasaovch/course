@@ -53,28 +53,28 @@ public class JwtUtils {
                 .parseClaimsJws(token).getBody().getSubject();
     }
 
-    public String retrieveUsername(Authentication authentication) {
-        if (authentication instanceof UsernamePasswordAuthenticationToken) {
-            // Approach 1: Using the getName() method
-            String username = authentication.getName();
-
-            // Approach 2: Casting Principal to UserDetails and calling getUsername()
-            Object principal = authentication.getPrincipal();
-            if (principal instanceof UserDetails) {
-                UserDetails userDetails = (UserDetails) principal;
-                username = userDetails.getUsername();
-            }
-
-            return username;
-        }
-        return null;
-    }
-
-
-    public static String getUserName(JwtAuthenticationToken authenticationToken) {
-        Jwt jwt = (Jwt) authenticationToken.getCredentials();
-        return (String) jwt.getClaims().get("username");
-    }
+//    public String retrieveUsername(Authentication authentication) {
+//        if (authentication instanceof UsernamePasswordAuthenticationToken) {
+//            // Approach 1: Using the getName() method
+//            String username = authentication.getName();
+//
+//            // Approach 2: Casting Principal to UserDetails and calling getUsername()
+//            Object principal = authentication.getPrincipal();
+//            if (principal instanceof UserDetails) {
+//                UserDetails userDetails = (UserDetails) principal;
+//                username = userDetails.getUsername();
+//            }
+//
+//            return username;
+//        }
+//        return null;
+//    }
+//
+//
+//    public static String getUserName(JwtAuthenticationToken authenticationToken) {
+//        Jwt jwt = (Jwt) authenticationToken.getCredentials();
+//        return (String) jwt.getClaims().get("username");
+//    }
 
     public boolean validateJwtToken(String authToken) {
         try {
