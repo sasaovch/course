@@ -55,13 +55,13 @@ public class AccusationProcessRepository {
     @Transactional
     public void handleSimpleCases(Integer accusationProcessId) {
         HandleSimpleCases handler = new HandleSimpleCases();
-        handler.setCurInquisitionProcess(accusationProcessId);
+        handler.setCurAccusationId(accusationProcessId);
         handler.execute(dsl.configuration());
     }
 
     public void handleCasesWithGraveSin(Integer accusationProcessId) {
         HandleCasesWithGraveSin handler = new HandleCasesWithGraveSin();
-        handler.setCurInquisitionProcess(accusationProcessId);
+        handler.setCurAccusationId(accusationProcessId);
         handler.execute(dsl.configuration());
     }
 }
