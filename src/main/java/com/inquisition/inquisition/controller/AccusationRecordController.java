@@ -4,7 +4,6 @@ import com.inquisition.inquisition.model.accusation.AddAccusationRecordContainer
 import com.inquisition.inquisition.model.accusation.ConnectCommandmentContainer;
 import com.inquisition.inquisition.model.payload.Payload;
 import com.inquisition.inquisition.service.impl.AccusationRecordServiceImpl;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,10 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
-@RequestMapping(
-        value = "/accusations",
-        produces = MediaType.APPLICATION_JSON_VALUE
-)
+@RequestMapping(value = "/accusations")
 public class AccusationRecordController {
     private final AccusationRecordServiceImpl accusationRecordService;
 

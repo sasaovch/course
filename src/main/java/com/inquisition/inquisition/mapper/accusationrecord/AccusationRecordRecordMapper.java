@@ -15,6 +15,8 @@ import org.jooq.RecordMapper;
 import org.jooq.Record;
 import org.springframework.stereotype.Component;
 
+import static com.inquisition.inquisition.mapper.person.PersonRecordMapper.convertGender;
+
 @RequiredArgsConstructor
 @Component
 public class AccusationRecordRecordMapper implements RecordMapper<AccusationRecordRecord, AccusationRecord> {
@@ -31,9 +33,9 @@ public class AccusationRecordRecordMapper implements RecordMapper<AccusationReco
         AccusationRecordFull recordFull = new AccusationRecordFull();
 //                record.into(AccusationRecordFull.class);
 
-        Person informer = record.into(Person.class);
-        Person bishop = record.into(Person.class);
-        Person accused = record.into(Person.class);
+        Person informer = convertToPerson(record, "informer");
+        Person bishop = convertToPerson(record, "bishop");
+        Person accused = convertToPerson(record, "accused");
 
         recordFull.setId(id);
         recordFull.setViolationPlace(violationPlace);
@@ -44,6 +46,18 @@ public class AccusationRecordRecordMapper implements RecordMapper<AccusationReco
         recordFull.setAccused(accused);
         return recordFull;
     }
+
+    private Person convertToPerson(Record record, String alias) {
+        return new Person(
+                record.get(com.inquisition.inquisition.models.tables.Person.PERSON.as(alias).ID),
+                record.get(com.inquisition.inquisition.models.tables.Person.PERSON.as(alias).NAME),
+                record.get(com.inquisition.inquisition.models.tables.Person.PERSON.as(alias).SURNAME),
+                record.get(com.inquisition.inquisition.models.tables.Person.PERSON.as(alias).BIRTH_DATE),
+                convertGender(record.get(com.inquisition.inquisition.models.tables.Person.PERSON.as(alias).PERSON_GENDER)),
+                record.get(com.inquisition.inquisition.models.tables.Person.PERSON.as(alias).LOCALITY_ID)
+        );
+    }
+
 
     public AccusationRecordFullWithCaseId mapWithCase(Record record) {
         AccusationRecordFull recordFull = mapFull(record);

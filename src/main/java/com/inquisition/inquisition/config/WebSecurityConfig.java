@@ -66,7 +66,7 @@ public class WebSecurityConfig {
                                 .requestMatchers("/auth/**").permitAll()
 //                                .requestMatchers("/inquisitions/**").permitAll()
 //                                .requestMatchers("/api/auth/**").permitAll()
-//                                .requestMatchers("/localities/**").permitAll()
+                                .requestMatchers("/localities/**").permitAll()
 //                                .requestMatchers("/bibles/**").permitAll()
 //                                .requestMatchers("/bibles/**").permitAll()
                                 .anyRequest().authenticated()

@@ -20,6 +20,6 @@ public class LocalityServiceImpl implements LocalityService {
 
     @Override
     public Payload getAllLocality() {
-        return new PayloadWithCollection<>(200, "", localityRepository.findAll());
+        return new PayloadWithCollection<>(200, localityRepository.findAll());
     }
 }

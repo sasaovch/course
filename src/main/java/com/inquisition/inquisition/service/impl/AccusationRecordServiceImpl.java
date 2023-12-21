@@ -1,48 +1,68 @@
 package com.inquisition.inquisition.service.impl;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.inquisition.inquisition.model.accusation.AccusationProcess;
 import com.inquisition.inquisition.model.accusation.AccusationRecordFull;
 import com.inquisition.inquisition.model.accusation.AccusationRecordFullWithCaseId;
 import com.inquisition.inquisition.model.accusation.AccusationRecordPayload;
 import com.inquisition.inquisition.model.accusation.AccusationRecordWithCasePayload;
 import com.inquisition.inquisition.model.accusation.AddAccusationRecordContainer;
 import com.inquisition.inquisition.model.accusation.ConnectCommandmentContainer;
-import com.inquisition.inquisition.model.cases.CaseLog;
 import com.inquisition.inquisition.model.payload.BasePayload;
 import com.inquisition.inquisition.model.payload.Payload;
 import com.inquisition.inquisition.model.payload.PayloadWithCollection;
+import com.inquisition.inquisition.repository.AccusationProcessRepository;
 import com.inquisition.inquisition.repository.AccusationRecordRepository;
-import com.inquisition.inquisition.repository.InvestigativeCaseRepository;
+import com.inquisition.inquisition.repository.QueryFetchHelper;
 import com.inquisition.inquisition.utils.AccusationRecordConverter;
-import org.springframework.aop.support.AopUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.KotlinDetector;
+import org.jooq.exception.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ReflectionUtils;
 
 @Service
 public class AccusationRecordServiceImpl {
-    @Autowired
-    AccusationRecordRepository accusationRecordRepository;
-    @Autowired
-    InvestigativeCaseRepository investigativeCaseRepository;
+    private final AccusationRecordRepository accusationRecordRepository;
+    private final AccusationProcessRepository accusationProcessRepository;
+
+    public AccusationRecordServiceImpl(AccusationRecordRepository accusationRecordRepository,
+                                       AccusationProcessRepository accusationProcessRepository) {
+        this.accusationRecordRepository = accusationRecordRepository;
+        this.accusationProcessRepository = accusationProcessRepository;
+    }
 
     public Payload getNotResolvedAccusationRecord(Integer accusationId) {
-        List<AccusationRecordFull> records =
-                accusationRecordRepository.getNotResolvedAccusationRecordWithSubFields(accusationId);
-        List<AccusationRecordPayload> payload =
-                records.stream().map(AccusationRecordConverter::convertToPayload).toList();
-        return new PayloadWithCollection<>(200, "", payload);
+        try {
+            return getAccusationProcessWrapper(
+                    accusationId,
+                    accusationRecordRepository::getNotResolvedAccusationRecordWithSubFields
+            );
+        } catch (DataAccessException e) {
+            return new BasePayload(400, "Процесс сбора доносов еще не окончен");
+        }
+    }
+
+    public Payload getAllAccusationRecords(Integer accusationId) {
+        return getAccusationProcessWrapper(
+                accusationId,
+                accusationRecordRepository::findByProcessId
+        );
     }
 
     public Payload getAllCases(Integer accusationId) {
-        List<AccusationRecordFullWithCaseId> records =
-                accusationRecordRepository.getNotResolvedAccusationRecordWithCases(accusationId);
+        AccusationProcess process = accusationProcessRepository.find(accusationId);
+        if (process == null) {
+            return new BasePayload(400, "Not found accusation process with id " + accusationId);
+        }
+        QueryFetchHelper<Integer, List<AccusationRecordFullWithCaseId>> helper = new QueryFetchHelper<>(
+                accusationId,
+                accusationRecordRepository::getNotResolvedAccusationRecordWithCases
+        );
+        List<AccusationRecordFullWithCaseId> records = helper.fetch();
         Map<Integer, List<AccusationRecordFullWithCaseId>> recordsByCaseId =
                 records.stream().collect(Collectors.groupingBy(AccusationRecordFullWithCaseId::getCaseId));
         Map<Integer, AccusationRecordWithCasePayload> payloadMap = recordsByCaseId.entrySet().stream()
@@ -63,21 +83,35 @@ public class AccusationRecordServiceImpl {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         List<Integer> caseIds = payloadMap.keySet().stream().toList();
-        Map<Integer, List<CaseLog>> caseLogs = investigativeCaseRepository.getCaseLogs(caseIds).stream().collect(Collectors.groupingBy(CaseLog::getCaseId));
-        return new PayloadWithCollection<>(200, "", payloadMap.values());
+//        Map<Integer, List<CaseLog>> caseLogs = investigativeCaseRepository.getCaseLogs(caseIds).stream().collect
+//        (Collectors.groupingBy(CaseLog::getCaseId));
+        return new PayloadWithCollection<>(200, payloadMap.values());
     }
 
-    //FIXME: нужно написать конвертеры в ожидаемые объекты
-    public Payload getAllAccusationRecords(Integer accusationProcessId) {
-        if (accusationProcessId == null) {
-            return new BasePayload(200, "Nothing was found");
+    private Payload getAccusationProcessWrapper(Integer accusationId,
+                                                Function<Integer, List<AccusationRecordFull>> sqlRequest) {
+        if (accusationId == null) {
+            return new BasePayload(400, "Accusation process id cannot be null");
         }
-        List<AccusationRecordFull> records = accusationRecordRepository.findByProcessId(accusationProcessId);
-        List<AccusationRecordPayload> payload = records.stream().map(AccusationRecordConverter::convertToPayload).toList();
-        return new PayloadWithCollection<>(200, "", payload);
+        AccusationProcess process = accusationProcessRepository.find(accusationId);
+        if (process == null) {
+            return new BasePayload(400, "Not found accusation process with id " + accusationId);
+        }
+        QueryFetchHelper<Integer, List<AccusationRecordFull>> helper = new QueryFetchHelper<>(
+                accusationId,
+                sqlRequest
+        );
+        List<AccusationRecordFull> records = helper.fetch();
+        List<AccusationRecordPayload> payload =
+                records.stream().map(AccusationRecordConverter::convertToPayload).toList();
+        return new PayloadWithCollection<>(200, payload);
     }
 
     public Payload addRecord(AddAccusationRecordContainer container) {
+        AccusationProcess process = accusationProcessRepository.find(container.getAccusationId());
+        if (process == null) {
+            return new BasePayload(400, "Not found accusation process with id " + container.getAccusationId());
+        }
         try {
             accusationRecordRepository.addRecord(
                     container.getAccusationId(),
@@ -87,16 +121,18 @@ public class AccusationRecordServiceImpl {
                     container.getDescription(),
                     container.getInformer()
             );
-        } catch (Exception e) {
-            return new BasePayload(400, "Процесс сбора доносов уже окончен");
+        } catch (DataAccessException e) {
+            return new BasePayload(400, "Process of collecting records has been finished");
+        } catch (DataIntegrityViolationException e) {
+            return new BasePayload(400, "Incorrect data");
         }
         return new BasePayload(200, "Added");
     }
 
     public Payload connectCommandment(ConnectCommandmentContainer container, Integer recordId) {
-        container.getCommandments().forEach(commandment -> {
-            accusationRecordRepository.connectCommandment(commandment, recordId);
-        });
+        container.getCommandments().forEach(commandment ->
+                accusationRecordRepository.connectCommandment(commandment, recordId)
+        );
         return new BasePayload(200, "Connected");
     }
 }

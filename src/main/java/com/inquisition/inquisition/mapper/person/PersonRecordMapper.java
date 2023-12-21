@@ -19,11 +19,11 @@ public class PersonRecordMapper implements RecordMapper<PersonRecord, Person> {
             return null;
         }
         Person person = personRecord.into(Person.class);
-        person.setGender(convert(personRecord.get(GENDER_TABLE_FIELD)));
+        person.setGender(convertGender(personRecord.get(GENDER_TABLE_FIELD)));
         return person;
     }
 
-    private Gender convert(com.inquisition.inquisition.models.enums.Gender modelName) {
+    public static Gender convertGender(com.inquisition.inquisition.models.enums.Gender modelName) {
         return Gender.valueOf(modelName.name().toUpperCase());
     }
 }

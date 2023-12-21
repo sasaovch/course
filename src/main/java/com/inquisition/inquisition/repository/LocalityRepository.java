@@ -1,11 +1,4 @@
 package com.inquisition.inquisition.repository;
-//
-//import java.util.List;
-//import java.util.Optional;
-//
-//import com.inquisition.inquisition.model.locality.Locality;
-//import com.inquisition.inquisition.model.user.User;
-//import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,9 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-//
 @Repository
-public class LocalityRepository implements CrudRepository<Locality> {
+public class LocalityRepository {
     private final DSLContext dsl;
     private final com.inquisition.inquisition.models.tables.Locality LOCALITY;
 
@@ -32,7 +24,6 @@ public class LocalityRepository implements CrudRepository<Locality> {
         LOCALITY = com.inquisition.inquisition.models.tables.Locality.LOCALITY;
     }
 
-    @Override
     public Locality insert(Locality locality) {
         return dsl.insertInto(LOCALITY)
                 .set(dsl.newRecord(LOCALITY, locality))
@@ -42,40 +33,25 @@ public class LocalityRepository implements CrudRepository<Locality> {
                 .into(Locality.class);
     }
 
-    @Override
-    public Locality update(Locality locality) {
-        return null;
-    }
-
-    @Override
-    public Locality find(Integer id) {
-        return null;
-    }
     @Transactional(readOnly = true)
     public Locality findByName(String name) {
         Optional<LocalityRecord> res = dsl.selectFrom(LOCALITY)
                 .where(LOCALITY.NAME.eq(name))
                 .fetchOptional();
-        var result = res.map(localityRecord -> {
-            var r = localityRecord.into(Locality.class);
-            return r;
-        }).orElse(null);
-        return result;
+        return res
+                .map(localityRecord -> localityRecord.into(Locality.class))
+                .orElse(null);
     }
 
-    @Override
+    @Transactional(readOnly = true)
     public List<Locality> findAll(Condition condition) {
         return dsl.selectFrom(LOCALITY)
                 .fetch()
                 .map(r -> r.into(Locality.class));
     }
 
+    @Transactional(readOnly = true)
     public List<Locality> findAll() {
         return findAll(DSL.trueCondition());
-    }
-
-    @Override
-    public Boolean delete(Integer id) {
-        return null;
     }
 }
