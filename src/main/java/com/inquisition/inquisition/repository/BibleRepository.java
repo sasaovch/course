@@ -10,48 +10,33 @@ import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
+import org.springframework.transaction.annotation.Transactional;
+//FIXME: good
 @Repository
-public class BibleRepository implements CrudRepository<Bible> {
+public class BibleRepository {
     private final DSLContext dsl;
-    private static final com.inquisition.inquisition.models.tables.Commandment COMMANDMENT = com.inquisition.inquisition.models.tables.Commandment.COMMANDMENT;
+    private static final com.inquisition.inquisition.models.tables.Commandment COMMANDMENT =
+            com.inquisition.inquisition.models.tables.Commandment.COMMANDMENT;
 
     @Autowired
     public BibleRepository(DSLContext dsl) {
         this.dsl = dsl;
     }
 
-    @Override
-    public Bible insert(Bible bible) {
-        return null;
-    }
-
-    @Override
-    public Bible update(Bible bible) {
-        return null;
-    }
-
-    @Override
-    public Bible find(Integer id) {
-        return null;
-    }
-
+    @Transactional(readOnly = true)
     public List<Bible> findAll() {
         return findAll(DSL.trueCondition());
     }
 
-    @Override
+    @Transactional(readOnly = true)
     public List<Bible> findAll(Condition condition) {
         return dsl.selectFrom(com.inquisition.inquisition.models.tables.Bible.BIBLE)
+                .where(condition)
                 .fetch()
                 .map(r -> r.into(Bible.class));
     }
 
-    @Override
-    public Boolean delete(Integer id) {
-        return null;
-    }
-
+    @Transactional(readOnly = true)
     public List<Commandment> getCommandment(Integer bibleId) {
         return dsl.select()
                 .from(COMMANDMENT)

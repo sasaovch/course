@@ -18,6 +18,7 @@ import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 //
 @Repository
@@ -50,7 +51,7 @@ public class LocalityRepository implements CrudRepository<Locality> {
     public Locality find(Integer id) {
         return null;
     }
-
+    @Transactional(readOnly = true)
     public Locality findByName(String name) {
         Optional<LocalityRecord> res = dsl.selectFrom(LOCALITY)
                 .where(LOCALITY.NAME.eq(name))

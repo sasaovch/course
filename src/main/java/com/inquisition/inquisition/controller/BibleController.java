@@ -5,6 +5,7 @@ import com.inquisition.inquisition.service.impl.BibleServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,11 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 
         produces = MediaType.APPLICATION_JSON_VALUE)
 public class BibleController {
-    @Autowired
-    private BibleServiceImpl bibleService;
+    private final BibleServiceImpl bibleService;
+
+    public BibleController(BibleServiceImpl bibleService) {
+        this.bibleService = bibleService;
+    }
 
     @GetMapping(value = "/")
-//    @PreAuthorize("hasAnyAuthority('Inquisitor')")
     public ResponseEntity<Payload> getAllBibles() {
         return ResponseEntity.ok(bibleService.getAllBible());
     }

@@ -5,7 +5,7 @@ import com.inquisition.inquisition.model.inquisition.InquisitionProcess;
 import com.inquisition.inquisition.model.inquisition.InquisitionProcessPayload;
 import com.inquisition.inquisition.model.person.Person;
 
-public class InquisitionProcessConverter {
+public final class InquisitionProcessConverter {
     public static CurrentInquisitionProcessPayload convertToCurrentPayload(InquisitionProcess process, Integer step) {
         CurrentInquisitionProcessPayload payload = new CurrentInquisitionProcessPayload();
         payload.setId(process.getId());

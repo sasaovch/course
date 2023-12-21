@@ -15,6 +15,12 @@ public class PayloadWithData<T> implements Payload {
         this.data = data;
     }
 
+    public PayloadWithData(Integer code, T data) {
+        this.code = code;
+        this.message = "";
+        this.data = data;
+    }
+
     public T data() {
         return data;
     };

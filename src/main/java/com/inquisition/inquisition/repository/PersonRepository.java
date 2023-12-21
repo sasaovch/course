@@ -12,6 +12,7 @@ import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class PersonRepository implements CrudRepository<Person> {
@@ -41,9 +42,13 @@ public class PersonRepository implements CrudRepository<Person> {
 
     @Override
     public Person find(Integer id) {
-        return null;
+        return dsl.selectFrom(PERSON)
+                .where(PERSON.ID.eq(id))
+                .fetchOptional()
+                .map(personRecordMapper::map)
+                .orElse(null);
     }
-
+    @Transactional(readOnly = true)
     public Person findByCondition(Condition condition) {
         return dsl.selectFrom(PERSON)
                 .where(condition)

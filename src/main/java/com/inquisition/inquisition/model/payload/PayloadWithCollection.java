@@ -16,6 +16,12 @@ public class PayloadWithCollection<T> implements Payload {
         this.collection = collection;
     }
 
+    public PayloadWithCollection(Integer code, Collection<T> collection) {
+        this.code = code;
+        this.message = "";
+        this.collection = collection;
+    }
+
     @Override
     public Integer code() {
         return code;

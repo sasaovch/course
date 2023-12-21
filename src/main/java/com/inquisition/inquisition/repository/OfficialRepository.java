@@ -16,6 +16,7 @@ import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class OfficialRepository implements CrudRepository<Official> {
@@ -44,10 +45,20 @@ public class OfficialRepository implements CrudRepository<Official> {
     public Official find(Integer id) {
         return null;
     }
-
+    @Transactional(readOnly = true)
     public Official findByPersonId(Integer personId) {
         return dsl.selectFrom(OFFICIAL)
                 .where(OFFICIAL.PERSON_ID.eq(personId))
+                .fetchOptional()
+                .map(officialRecordMapper::map)
+                .orElse(null);
+    }
+
+    @Transactional(readOnly = true)
+    public Official getCurrentByPersonId(Integer personId) {
+        return dsl.selectFrom(OFFICIAL)
+                .where(OFFICIAL.PERSON_ID.eq(personId))
+                .and(OFFICIAL.FIRED_DATE.isNull())
                 .fetchOptional()
                 .map(officialRecordMapper::map)
                 .orElse(null);

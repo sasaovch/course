@@ -21,6 +21,7 @@ import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.inquisition.inquisition.models.tables.GetNotResolvedAccusationRecord.GET_NOT_RESOLVED_ACCUSATION_RECORD;
 import static org.jooq.impl.DSL.count;
@@ -49,18 +50,19 @@ public class AccusationRecordRepository implements CrudRepository<AccusationReco
     }
 
     public List<AccusationRecordFull> getNotResolvedAccusationRecordWithSubFields(Integer processId) {
-        GetNotResolvedAccusationRecord function = new GetNotResolvedAccusationRecord().call(processId);;
-        return dsl.select(GET_NOT_RESOLVED_ACCUSATION_RECORD)
-                .from(function)
-                .join(Person.PERSON.as("bishop"))
-                .on(Person.PERSON.as("bishop").ID.eq(GET_NOT_RESOLVED_ACCUSATION_RECORD.BISHOP))
-                .join(Person.PERSON.as("informer"))
-                .on(Person.PERSON.as("informer").ID.eq(GET_NOT_RESOLVED_ACCUSATION_RECORD.INFORMER))
-                .join(Person.PERSON.as("accused"))
-                .on(Person.PERSON.as("accused").ID.eq(GET_NOT_RESOLVED_ACCUSATION_RECORD.ACCUSED))
-                .where(GET_NOT_RESOLVED_ACCUSATION_RECORD.ID_ACCUSATION.eq(processId))
-                .fetch()
-                .map(accusationRecordRecordMapper::mapFull);
+        return new ArrayList<>();
+//        GetNotResolvedAccusationRecord function = new GetNotResolvedAccusationRecord().call(processId);
+//        return dsl.select(function)
+//                .from(function)
+//                .join(Person.PERSON.as("bishop"))
+//                .on(Person.PERSON.as("bishop").ID.eq(GET_NOT_RESOLVED_ACCUSATION_RECORD.BISHOP))
+//                .join(Person.PERSON.as("informer"))
+//                .on(Person.PERSON.as("informer").ID.eq(GET_NOT_RESOLVED_ACCUSATION_RECORD.INFORMER))
+//                .join(Person.PERSON.as("accused"))
+//                .on(Person.PERSON.as("accused").ID.eq(GET_NOT_RESOLVED_ACCUSATION_RECORD.ACCUSED))
+//                .where(GET_NOT_RESOLVED_ACCUSATION_RECORD.ID_ACCUSATION.eq(processId))
+//                .fetch()
+//                .map(accusationRecordRecordMapper::mapFull);
     }
 
 //    public List<AccusationRecordFullWithCaseId> getNotResolvedAccusationRecordWithCases(Integer processId) {
@@ -132,6 +134,7 @@ public class AccusationRecordRepository implements CrudRepository<AccusationReco
                 .map(accusationRecordRecordMapper::mapFull);
     }
 
+    @Transactional(readOnly = true)
     public List<Pair<Integer, Integer>> findAllCases(List<Integer> accusationProcessIds) {
         return dsl.select(
                 AccusationProcess.ACCUSATION_PROCESS.ID,

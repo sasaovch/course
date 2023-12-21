@@ -13,6 +13,7 @@ import org.jooq.DSLContext;
 import org.jooq.exception.DataAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class UserRepository implements CrudRepository<User> {
@@ -27,7 +28,7 @@ public class UserRepository implements CrudRepository<User> {
         this.userRecordMapper = userRecordMapper;
         this.userRecordUnmapper = userRecordUnmapper;
     }
-
+    @Transactional()
     public User insert(User user) {
         return dsl.insertInto(USER)
                 .set(dsl.newRecord(USER, user))
@@ -36,7 +37,7 @@ public class UserRepository implements CrudRepository<User> {
                 .map(userRecordMapper::map)
                 .orElse(null);
     }
-
+//    @Transactional()
     public User insertValues(User user) {
 //        UserRoles role = UserRoles.valueOf(user.getRole().toString().toUpperCase());
         return dsl.insertInto(USER)  //insert into countries
@@ -45,7 +46,7 @@ public class UserRepository implements CrudRepository<User> {
                 .fetchOne()
                 .map(r -> userRecordMapper.map((UsersRecord) r));
     }
-
+    @Transactional()
     public User update(User user) {
         return dsl.update(USER)
                 .set(userRecordUnmapper.unmap(user))
@@ -55,7 +56,7 @@ public class UserRepository implements CrudRepository<User> {
                 .map(userRecordMapper::map)
                 .orElse(null);
     }
-
+    @Transactional(readOnly = true)
     public User find(Integer id) {
         return dsl.selectFrom(USER) //select * from countries
                 .where(USER.ID.eq(id))  //where id = ?
@@ -63,6 +64,7 @@ public class UserRepository implements CrudRepository<User> {
                 .map(r -> userRecordMapper.map((UsersRecord) r));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<User> findAll(Condition condition) {
         return dsl.selectFrom(USER)
@@ -70,13 +72,13 @@ public class UserRepository implements CrudRepository<User> {
                 .fetch()
                 .map(userRecordMapper::map);
     }
-
+    @Transactional()
     public Boolean delete(Integer id) {
         return dsl.deleteFrom(USER)
                 .where(USER.ID.eq(id))
                 .execute() == 1;
     }
-
+    @Transactional(readOnly = true)
     public User findByUsername(String username) {
         return dsl.selectFrom(USER)
                 .where(USER.USERNAME.eq(username))
@@ -84,7 +86,7 @@ public class UserRepository implements CrudRepository<User> {
                 .map(userRecordMapper::map)
                 .orElse(null);
     }
-
+    @Transactional(readOnly = true)
     public Boolean existsByUsername(String username) {
         return !dsl.selectFrom(USER)
                 .where(USER.USERNAME.eq(username))

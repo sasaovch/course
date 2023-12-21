@@ -21,10 +21,10 @@ public class BibleServiceImpl implements BibleService {
 
     @Override
     public Payload getAllBible() {
-        return new PayloadWithCollection<>(200, "", bibleRepository.findAll());
+        return new PayloadWithCollection<>(200, bibleRepository.findAll());
     }
 
     public Payload getCommandments(Integer bibleId) {
-        return new PayloadWithCollection<>(200, "", bibleRepository.getCommandment(bibleId));
+        return new PayloadWithCollection<>(200, bibleRepository.getCommandment(bibleId));
     }
 }

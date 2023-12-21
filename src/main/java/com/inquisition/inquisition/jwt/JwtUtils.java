@@ -14,8 +14,10 @@ import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
@@ -50,6 +52,24 @@ public class JwtUtils {
         return Jwts.parserBuilder().setSigningKey(key()).build()
                 .parseClaimsJws(token).getBody().getSubject();
     }
+
+    public String retrieveUsername(Authentication authentication) {
+        if (authentication instanceof UsernamePasswordAuthenticationToken) {
+            // Approach 1: Using the getName() method
+            String username = authentication.getName();
+
+            // Approach 2: Casting Principal to UserDetails and calling getUsername()
+            Object principal = authentication.getPrincipal();
+            if (principal instanceof UserDetails) {
+                UserDetails userDetails = (UserDetails) principal;
+                username = userDetails.getUsername();
+            }
+
+            return username;
+        }
+        return null;
+    }
+
 
     public static String getUserName(JwtAuthenticationToken authenticationToken) {
         Jwt jwt = (Jwt) authenticationToken.getCredentials();

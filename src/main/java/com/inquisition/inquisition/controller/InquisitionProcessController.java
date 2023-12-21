@@ -4,9 +4,9 @@ import com.inquisition.inquisition.model.inquisition.InquisitionProcessStartCont
 import com.inquisition.inquisition.model.payload.Payload;
 import com.inquisition.inquisition.service.impl.InquisitionServiceImpl;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,42 +17,42 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
-@RequestMapping(value = "/inquisitions",
-//        consumes = MediaType.APPLICATION_JSON_VALUE,
-        produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(
+        value = "/inquisitions",
+        produces = MediaType.APPLICATION_JSON_VALUE
+)
+@PreAuthorize("hasAnyAuthority('INQUISITOR')")
 public class InquisitionProcessController {
-    @Autowired
-    InquisitionServiceImpl inquisitionService;
+    private final InquisitionServiceImpl inquisitionService;
+
+    public InquisitionProcessController(InquisitionServiceImpl inquisitionService) {
+        this.inquisitionService = inquisitionService;
+    }
 
     @PostMapping("/start")
-//    @PreAuthorize("hasAnyAuthority('Fiscal') or hasAnyAuthority('Inquisitor')")
-    public ResponseEntity<Payload> startProcess(
-            @Valid @RequestBody InquisitionProcessStartContainer container
-    ) {
-        return ResponseEntity.ok(inquisitionService.startProcess(container));
+    public ResponseEntity<Payload> startProcess(@Valid @RequestBody InquisitionProcessStartContainer container) {
+        Payload payload = inquisitionService.startProcess(container);
+        if (payload.code() != 200) {
+            return ResponseEntity.badRequest().body(payload);
+        }
+        return ResponseEntity.ok(payload);
     }
 
     @GetMapping("/getCurrent/{official_id}")
-//    @PreAuthorize("hasAnyAuthority('Inquisitor')")
     public ResponseEntity<Payload> getCurrentProcess(@PathVariable("official_id") Integer officialId) {
-        return ResponseEntity.ok(inquisitionService.getCurrentInquisitionProcess(officialId));
+        Payload payload = inquisitionService.getCurrentInquisitionProcess(officialId);
+        if (payload.code() != 200) {
+            return ResponseEntity.badRequest().body(payload);
+        }
+        return ResponseEntity.ok(payload);
     }
-
-//    @GetMapping("/getAccusationRecords/{process_id}")
-////    @PreAuthorize("hasAnyAuthority('Inquisitor')")
-//    public ResponseEntity<?> getAccusationRecords(@PathVariable("process_id") Integer processId) {
-//        return ResponseEntity.ok(inquisitionService.getAllAccusationRecords(processId));
-//    }
 
     @GetMapping("/getAllInquisitions")
-//    @PreAuthorize("hasAnyAuthority('Inquisitor')")
     public ResponseEntity<Payload> getAllInquisitions() {
-        return ResponseEntity.ok(inquisitionService.getAllInquisitionProcess());
+        Payload payload = inquisitionService.getAllInquisitionProcess();
+        if (payload.code() != 200) {
+            return ResponseEntity.badRequest().body(payload);
+        }
+        return ResponseEntity.ok(payload);
     }
-
-
-//    @GetMapping("/getQueueForDiscussion/{process_id}")
-//    public ResponseEntity<Payload> getQueueForDiscussion(@PathVariable("process_id") Integer processId) {
-//        inquisitionService.getQueueForDiscussion(processId);
-//    }
 }

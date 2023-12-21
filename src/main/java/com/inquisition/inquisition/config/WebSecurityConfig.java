@@ -62,13 +62,14 @@ public class WebSecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth
-                                .requestMatchers("/**").permitAll()
+                                .requestMatchers("/").permitAll()
+                                .requestMatchers("/auth/**").permitAll()
 //                                .requestMatchers("/inquisitions/**").permitAll()
 //                                .requestMatchers("/api/auth/**").permitAll()
 //                                .requestMatchers("/localities/**").permitAll()
 //                                .requestMatchers("/bibles/**").permitAll()
 //                                .requestMatchers("/bibles/**").permitAll()
-//                                .anyRequest().authenticated()
+                                .anyRequest().authenticated()
                 );
 
         http.authenticationProvider(authenticationProvider());

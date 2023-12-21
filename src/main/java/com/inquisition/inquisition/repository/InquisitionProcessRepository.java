@@ -18,6 +18,7 @@ import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class InquisitionProcessRepository implements CrudRepository<InquisitionProcess> {
@@ -77,6 +78,7 @@ public class InquisitionProcessRepository implements CrudRepository<InquisitionP
                 .map(r -> inquisitionProcessRecordMapper.mapFull(r));
     }
 
+    @Transactional(readOnly = true)
     public List<InquisitionProcess> findAll() {
         return dsl.select()
                 .from(INQUISITION_PROCESS)
@@ -120,6 +122,7 @@ public class InquisitionProcessRepository implements CrudRepository<InquisitionP
                 .map(r -> inquisitionProcessRecordMapper.mapFull(r));
     }
 
+    @Transactional(readOnly = true)
     public List<InquisitionProcess> findInProgressByOfficialId(Integer officialId) {
         return dsl.select()
                 .from(INQUISITION_PROCESS)
@@ -139,6 +142,7 @@ public class InquisitionProcessRepository implements CrudRepository<InquisitionP
                 .map(inquisitionProcessRecordMapper::mapFull);
     }
 
+    @Transactional
     public Integer startInquisitionProcess(
             Integer officialId,
             Integer churchId,

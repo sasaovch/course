@@ -10,6 +10,7 @@ import com.inquisition.inquisition.model.person.Person;
 import com.inquisition.inquisition.model.user.LoginUser;
 import com.inquisition.inquisition.model.user.SignupUser;
 import com.inquisition.inquisition.model.user.User;
+import com.inquisition.inquisition.model.user.LoginedUser;
 import com.inquisition.inquisition.model.user.UserDTO;
 import com.inquisition.inquisition.model.user.UserRole;
 import com.inquisition.inquisition.repository.LocalityRepository;
@@ -28,6 +29,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import static com.inquisition.inquisition.repository.PersonRepository.allFieldsExceptId;
+import static com.inquisition.inquisition.utils.UserConverter.getRoleByOfficial;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -39,27 +41,53 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final JwtUtils jwtUtils;
 
-    @Autowired
-    private LocalityRepository localityRepository;
+    private final LocalityRepository localityRepository;
 
-    @Autowired
-    private PersonRepository personRepository;
+    private final PersonRepository personRepository;
 
-    @Autowired
-    private OfficialRepository officialRepository;
+    private final OfficialRepository officialRepository;
 
     @Autowired
     public AuthenticationServiceImpl(AuthenticationManager authenticationManager, UserRepository userRepository,
-                          PasswordEncoder encoder, JwtUtils jwtUtils) {
+                                     PasswordEncoder encoder, JwtUtils jwtUtils, LocalityRepository localityRepository,
+                                     PersonRepository personRepository, OfficialRepository officialRepository) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.encoder = encoder;
         this.jwtUtils = jwtUtils;
+        this.localityRepository = localityRepository;
+        this.personRepository = personRepository;
+        this.officialRepository = officialRepository;
     }
+    //FIXME: повесить везде аннотации транзакции
+    //FIXME: good
     public Payload authenticateUser(LoginUser loginUser) {
-        return new PayloadWithUser(200, "", login(loginUser.getUsername(), loginUser.getPassword()));
-    }
+        User user = userRepository.findByUsername(loginUser.getUsername());
+        if (user == null) {
+            return new BasePayload(400, "User with username doesn't exist.");
+        }
 
+        LoginedUser loginedUser = login(user.getUsername(), loginUser.getPassword());
+        Person person = personRepository.find(user.getPersonId());
+        Official official = officialRepository.getCurrentByPersonId(person.getId());
+        UserRole role = getRoleByOfficial(official);
+        Integer officialId = null;
+        if (official != null) {
+            officialId = official.getId();
+        }
+
+        UserDTO userDTO = new UserDTO(
+                loginedUser.username(),
+                role,
+                loginedUser.jwtToken(),
+                person.getId(),
+                officialId,
+                person.getName() + " " + person.getSurname()
+        );
+
+        return new PayloadWithUser(200, userDTO);
+    }
+    //FIXME: good
     public Payload registerUser(SignupUser signupUser) {
         if (Boolean.TRUE.equals(userRepository.existsByUsername(signupUser.getUsername()))) {
             return new BasePayload(400, "User with username already exists.");
@@ -83,7 +111,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return new BasePayload(400, "User with name not found.");
         }
 
-        Official official = officialRepository.findByPersonId(person.getId());
+        Official official = officialRepository.getCurrentByPersonId(person.getId());
         UserRole role = getRoleByOfficial(official);
 
         User user = new User(
@@ -92,33 +120,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 encoder.encode(signupUser.getPassword()),
                 role
         );
+
         userRepository.insert(user);
+        LoginedUser loginedUser = login(user.getUsername(), signupUser.getPassword());
+        UserDTO userDTO = new UserDTO(
+                loginedUser.username(),
+                role,
+                loginedUser.jwtToken(),
+                person.getId(),
+                official.getId(),
+                person.getName() + " " + person.getSurname()
+        );
 
-        return new PayloadWithUser(200, "", login(user.getUsername(), signupUser.getPassword()));
+        return new PayloadWithUser(200, userDTO);
     }
 
-    private UserRole getRoleByOfficial(Official official) {
-        if (official == null) return UserRole.USER;
-        switch (official.getOfficialName()) {
-            case BISHOP -> {
-                return UserRole.BISHOP;
-            }
-            case FISCAL -> {
-                return UserRole.FISCAL;
-            }
-            case INQUISITOR -> {
-                return UserRole.INQUISITOR;
-            }
-            case SECULAR_AUTHORITY -> {
-                return UserRole.SECULAR_AUTHORITY;
-            }
-            default -> {
-                return UserRole.USER;
-            }
-        }
-    }
-
-    private UserDTO login(String username, String password) {
+    private LoginedUser login(String username, String password) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password));
 
