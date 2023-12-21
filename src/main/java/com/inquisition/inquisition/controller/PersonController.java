@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
-@RequestMapping(value = "/",
-        produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(
+        value = "/persons",
+        produces = MediaType.APPLICATION_JSON_VALUE
+)
 public class PersonController {
     private final PersonServiceImpl personService;
 
@@ -21,7 +23,7 @@ public class PersonController {
         this.personService = personService;
     }
 
-    @GetMapping("/persons/{locality_id}")
+    @GetMapping("/{locality_id}")
     public ResponseEntity<Payload> getPersonsByLocality(@PathVariable("locality_id") Integer localityId) {
         return ResponseEntity.ok(personService.getPersonByLocality(localityId));
     }

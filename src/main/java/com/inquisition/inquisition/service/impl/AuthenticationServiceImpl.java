@@ -113,6 +113,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         Official official = officialRepository.getCurrentByPersonId(person.getId());
         UserRole role = getRoleByOfficial(official);
+        Integer officialId = null;
+        if (official != null) {
+            officialId = official.getId();
+        }
 
         User user = new User(
                 person.getId(),
@@ -128,7 +132,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 role,
                 loginedUser.jwtToken(),
                 person.getId(),
-                official.getId(),
+                officialId,
                 person.getName() + " " + person.getSurname()
         );
 

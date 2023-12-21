@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping(value = "/accusations")
+@PreAuthorize("hasAnyAuthority('INQUISITOR')")
 public class AccusationRecordController {
     private final AccusationRecordServiceImpl accusationRecordService;
 
@@ -53,6 +54,7 @@ public class AccusationRecordController {
     }
 
     @PostMapping("/add")
+    @PreAuthorize("hasAnyAuthority('INQUISITOR', 'BISHOP')")
     public ResponseEntity<Payload> add(@RequestBody AddAccusationRecordContainer container) {
         Payload payload = accusationRecordService.addRecord(container);
         if (payload.code() != 200) {

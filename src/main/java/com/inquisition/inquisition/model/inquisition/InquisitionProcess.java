@@ -18,43 +18,14 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import lombok.Data;
-//public record InquisitionProcess(
-//        Integer id,
-//        LocalDate startDate,
-//        LocalDate finishDate,
-//        Integer officialId,
-//        Integer churchId,
-//        Integer bibleId,
-//        AccusationProcess accusationProcess
-//) {
-//}
-//
 @Data
-//@Entity(name = "inquisition_process")
 public class InquisitionProcess {
-//
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-//
-//    @Column(name = "start_data", nullable = false)
     private LocalDate startData;
-//
-//    @Column(name = "finish_data")
     private LocalDate finishData;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "official_id", nullable = false)
     private Official official;
 
-//    @ManyToOne
-//    @JoinColumn(name = "church_id", nullable = false)
     private Church church;
-
-//    @ManyToOne
-//    @JoinColumn(name = "bible_id", nullable = false)
     private Bible bible;
-
-//    @OneToOne(mappedBy = "inquisitionProcess")
     private AccusationProcess accusationProcess;
 }

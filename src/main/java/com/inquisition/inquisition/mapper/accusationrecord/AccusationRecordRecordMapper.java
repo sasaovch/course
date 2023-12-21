@@ -33,9 +33,9 @@ public class AccusationRecordRecordMapper implements RecordMapper<AccusationReco
         AccusationRecordFull recordFull = new AccusationRecordFull();
 //                record.into(AccusationRecordFull.class);
 
-        Person informer = convertToPerson(record, "informer");
-        Person bishop = convertToPerson(record, "bishop");
-        Person accused = convertToPerson(record, "accused");
+        Person informer = convertToPerson("informer", record);
+        Person bishop = convertToPerson("bishop", record);
+        Person accused = convertToPerson("accused", record);
 
         recordFull.setId(id);
         recordFull.setViolationPlace(violationPlace);
@@ -47,7 +47,7 @@ public class AccusationRecordRecordMapper implements RecordMapper<AccusationReco
         return recordFull;
     }
 
-    private Person convertToPerson(Record record, String alias) {
+    public static Person convertToPerson(String alias, Record record) {
         return new Person(
                 record.get(com.inquisition.inquisition.models.tables.Person.PERSON.as(alias).ID),
                 record.get(com.inquisition.inquisition.models.tables.Person.PERSON.as(alias).NAME),

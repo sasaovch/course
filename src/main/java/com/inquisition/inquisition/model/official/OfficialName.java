@@ -28,4 +28,13 @@ public enum OfficialName {
         }
         throw new IllegalArgumentException("Invalid MyEnum id: " + id);
     }
+
+    public static OfficialName valueOfSql(String name) {
+        for (OfficialName value : OfficialName.values()) {
+            if (value.displayName.equals(name)) {
+                return value;
+            }
+        }
+        throw new IllegalArgumentException("Invalid MyEnum id: " + name);
+    }
 }

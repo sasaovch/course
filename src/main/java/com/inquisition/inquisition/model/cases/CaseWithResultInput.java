@@ -6,4 +6,5 @@ import lombok.Data;
 public class CaseWithResultInput {
     private Integer id;
     private Integer result;
+    private String description;
 }
