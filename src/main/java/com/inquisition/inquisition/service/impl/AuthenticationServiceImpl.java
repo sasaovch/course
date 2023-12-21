@@ -93,7 +93,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return new BasePayload(400, "User with username already exists.");
         }
 
-        Locality locality = localityRepository.findByName(signupUser.getLocality());
+        Locality locality = localityRepository.find(signupUser.getLocality());
         if (locality == null) {
             return new BasePayload(400, "Locality not found.");
         }

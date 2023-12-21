@@ -44,6 +44,15 @@ public class LocalityRepository {
     }
 
     @Transactional(readOnly = true)
+    public Locality find(Integer id) {
+        return dsl.selectFrom(LOCALITY)
+                .where(LOCALITY.ID.eq(id))
+                .fetchOptional()
+                .map(localityRecord -> localityRecord.into(Locality.class))
+                .orElse(null);
+    }
+
+    @Transactional(readOnly = true)
     public List<Locality> findAll(Condition condition) {
         return dsl.selectFrom(LOCALITY)
                 .fetch()

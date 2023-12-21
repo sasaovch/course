@@ -20,9 +20,8 @@ public class SignupUser {
     private LocalDate birthDate;
     @NotNull
     private Gender personGender;
-    @NotBlank
-    @Size(min = 3, max = 20)
-    private String locality;
+    @NotNull
+    private Integer locality;
     @NotBlank
     @Size(min = 3, max = 20)
     private String username;
