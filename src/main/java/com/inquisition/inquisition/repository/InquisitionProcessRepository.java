@@ -66,7 +66,7 @@ public class InquisitionProcessRepository {
     public List<InquisitionProcess> findInProgressByOfficialId(Integer officialId) {
         return getComplexSelectQuery()
                 .where(INQUISITION_PROCESS_TABLE.FINISH_DATA.isNull())
-                .and(CHURCH_TABLE.LOCALITY_ID.eq(officialId))
+                .and(INQUISITION_PROCESS_TABLE.OFFICIAL_ID.eq(officialId))
 
                 .fetch()
                 .map(inquisitionProcessRecordMapper::mapInquisitionProcess);
