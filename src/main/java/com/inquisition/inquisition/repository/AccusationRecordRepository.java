@@ -123,7 +123,8 @@ public class AccusationRecordRepository {
             Integer bishop,
             LocalDate date,
             String description,
-            Integer informer
+            Integer informer,
+            String violationPlace
     ) {
         AddAccusationRecord addAccusationRecord = new AddAccusationRecord();
         addAccusationRecord.setCurAccusationId(accusationId);
@@ -132,6 +133,7 @@ public class AccusationRecordRepository {
         addAccusationRecord.setCurDate(date);
         addAccusationRecord.setCurDescription(description);
         addAccusationRecord.setCurInformer(informer);
+        addAccusationRecord.setCurViolationPlace(violationPlace);
         addAccusationRecord.execute(dsl.configuration());
     }
 

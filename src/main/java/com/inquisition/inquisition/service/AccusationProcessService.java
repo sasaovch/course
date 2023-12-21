@@ -134,7 +134,8 @@ public class AccusationProcessService {
                     container.getBishop(),
                     container.getDateTime(),
                     container.getDescription(),
-                    container.getInformer()
+                    container.getInformer(),
+                    container.getViolationPlace()
             );
         } catch (DataAccessException e) {
             return new BasePayload(400, "Процесс сбора доносов завершен");
