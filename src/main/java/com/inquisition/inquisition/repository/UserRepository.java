@@ -5,93 +5,86 @@ import java.util.List;
 import com.inquisition.inquisition.mapper.user.UserRecordMapper;
 import com.inquisition.inquisition.mapper.user.UserRecordUnmapper;
 import com.inquisition.inquisition.model.user.User;
-import com.inquisition.inquisition.models.enums.UserRoles;
-import com.inquisition.inquisition.models.tables.Users;
-import com.inquisition.inquisition.models.tables.records.UsersRecord;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.exception.DataAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.inquisition.inquisition.utils.TableAliases.USER_TABLE;
+
 @Repository
-public class UserRepository implements CrudRepository<User> {
+public class UserRepository {
     private final DSLContext dsl;
-    private final UserRecordMapper userRecordMapper;
     private final UserRecordUnmapper userRecordUnmapper;
-    private static final Users USER = Users.USERS;
+    private final UserRecordMapper userRecordMapper;
 
     @Autowired
-    public UserRepository(DSLContext dsl, UserRecordMapper userRecordMapper, UserRecordUnmapper userRecordUnmapper) {
+    public UserRepository(DSLContext dsl,
+                          UserRecordUnmapper userRecordUnmapper,
+                          UserRecordMapper userRecordMapper) {
         this.dsl = dsl;
-        this.userRecordMapper = userRecordMapper;
         this.userRecordUnmapper = userRecordUnmapper;
+        this.userRecordMapper = userRecordMapper;
     }
-    @Transactional()
+
+    @Transactional
     public User insert(User user) {
-        return dsl.insertInto(USER)
-                .set(dsl.newRecord(USER, user))
+        return dsl.insertInto(USER_TABLE)
+                .set(dsl.newRecord(USER_TABLE, user))
                 .returning()
                 .fetchOptional()
-                .map(userRecordMapper::map)
+                .map(userRecordMapper::mapUser)
                 .orElse(null);
     }
-//    @Transactional()
-    public User insertValues(User user) {
-//        UserRoles role = UserRoles.valueOf(user.getRole().toString().toUpperCase());
-        return dsl.insertInto(USER)  //insert into countries
-                .set(userRecordUnmapper.unmap(user))
-                .returning()
-                .fetchOne()
-                .map(r -> userRecordMapper.map((UsersRecord) r));
-    }
-    @Transactional()
+
+    @Transactional
     public User update(User user) {
-        return dsl.update(USER)
+        return dsl.update(USER_TABLE)
                 .set(userRecordUnmapper.unmap(user))
-                .where(USER.ID.eq(user.getId()))
+                .where(USER_TABLE.ID.eq(user.getId()))
                 .returning()
                 .fetchOptional()
-                .map(userRecordMapper::map)
+                .map(userRecordMapper::mapUser)
                 .orElse(null);
-    }
-    @Transactional(readOnly = true)
-    public User find(Integer id) {
-        return dsl.selectFrom(USER) //select * from countries
-                .where(USER.ID.eq(id))  //where id = ?
-                .fetchAny()  //здесь определяем, что мы хотим вернуть
-                .map(r -> userRecordMapper.map((UsersRecord) r));
     }
 
     @Transactional(readOnly = true)
-    @Override
+    public User find(Integer id) {
+        return dsl.selectFrom(USER_TABLE)
+                .where(USER_TABLE.ID.eq(id))
+                .fetchOptional()
+                .map(userRecordMapper::mapUser)
+                .orElse(null);
+    }
+
+    @Transactional(readOnly = true)
     public List<User> findAll(Condition condition) {
-        return dsl.selectFrom(USER)
+        return dsl.selectFrom(USER_TABLE)
                 .where(condition)
                 .fetch()
-                .map(userRecordMapper::map);
+                .map(userRecordMapper::mapUser);
     }
     @Transactional()
     public Boolean delete(Integer id) {
-        return dsl.deleteFrom(USER)
-                .where(USER.ID.eq(id))
+        return dsl.deleteFrom(USER_TABLE)
+                .where(USER_TABLE.ID.eq(id))
                 .execute() == 1;
     }
     @Transactional(readOnly = true)
     public User findByUsername(String username) {
-        return dsl.selectFrom(USER)
-                .where(USER.USERNAME.eq(username))
+        return dsl.selectFrom(USER_TABLE)
+                .where(USER_TABLE.USERNAME.eq(username))
                 .fetchOptional()
-                .map(userRecordMapper::map)
+                .map(userRecordMapper::mapUser)
                 .orElse(null);
     }
     @Transactional(readOnly = true)
     public Boolean existsByUsername(String username) {
-        return !dsl.selectFrom(USER)
-                .where(USER.USERNAME.eq(username))
+        return !dsl.selectFrom(USER_TABLE)
+                .where(USER_TABLE.USERNAME.eq(username))
                 .fetch()
-                .map(userRecordMapper::map)
+                .map(userRecordMapper::mapUser)
                 .isEmpty();
     }
 }

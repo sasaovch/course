@@ -1,7 +1,7 @@
 package com.inquisition.inquisition.controller;
 
 import com.inquisition.inquisition.model.payload.Payload;
-import com.inquisition.inquisition.service.impl.PersonServiceImpl;
+import com.inquisition.inquisition.service.PersonServiceImpl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;

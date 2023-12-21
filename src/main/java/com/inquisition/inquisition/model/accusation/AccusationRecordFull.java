@@ -1,6 +1,6 @@
 package com.inquisition.inquisition.model.accusation;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import com.inquisition.inquisition.model.person.Person;
 import lombok.Data;
@@ -12,6 +12,6 @@ public class AccusationRecordFull {
     private Person bishop;
     private Person accused;
     private String violationPlace;
-    private LocalDateTime violationTime;
+    private LocalDate violationTime;
     private String description;
 }

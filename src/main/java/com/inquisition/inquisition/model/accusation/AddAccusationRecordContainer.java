@@ -1,19 +1,24 @@
 package com.inquisition.inquisition.model.accusation;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public class AddAccusationRecordContainer {
-    /*
-    cur_informer integer, cur_bishop integer, cur_accused integer, cur_violation_place varchar(255), cur_date_time timestamp, cur_description text, cur_accusation_id integer
-     */
+    @NotNull
     private Integer informer;
+    @NotNull
     private Integer bishop;
+    @NotNull
     private Integer accused;
+    @NotNull
     private String violationPlace;
-    private LocalDateTime dateTime;
+    @NotNull
+    private LocalDate dateTime;
+    @NotNull
     private String description;
+    @NotNull
     private Integer accusationId;
 }

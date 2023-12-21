@@ -1,4 +1,4 @@
-package com.inquisition.inquisition.service.impl;
+package com.inquisition.inquisition.service;
 
 import java.util.List;
 

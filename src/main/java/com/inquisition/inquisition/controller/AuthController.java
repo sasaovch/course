@@ -3,8 +3,7 @@ package com.inquisition.inquisition.controller;
 import com.inquisition.inquisition.model.payload.Payload;
 import com.inquisition.inquisition.model.user.LoginUser;
 import com.inquisition.inquisition.model.user.SignupUser;
-import com.inquisition.inquisition.service.intr.AuthenticationService;
-import com.inquisition.inquisition.service.impl.AuthenticationServiceImpl;
+import com.inquisition.inquisition.service.AuthenticationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -25,7 +24,7 @@ public class AuthController {
     private final AuthenticationService authenticationService;
 
     @Autowired
-    public AuthController(AuthenticationServiceImpl authenticationService) {
+    public AuthController(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
     }
 

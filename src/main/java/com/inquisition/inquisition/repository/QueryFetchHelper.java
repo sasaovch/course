@@ -2,7 +2,6 @@ package com.inquisition.inquisition.repository;
 
 import java.util.function.Function;
 
-import com.inquisition.inquisition.service.impl.InquisitionServiceImpl;
 import org.jooq.exception.DataAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

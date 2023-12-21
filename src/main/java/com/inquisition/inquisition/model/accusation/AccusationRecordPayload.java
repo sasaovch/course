@@ -1,7 +1,6 @@
 package com.inquisition.inquisition.model.accusation;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import lombok.Data;
 
@@ -12,6 +11,6 @@ public class AccusationRecordPayload {
     private String bishop;
     private String accused;
     private String violationPlace;
-    private LocalDateTime dateTime;
+    private LocalDate dateTime;
     private String description;
 }

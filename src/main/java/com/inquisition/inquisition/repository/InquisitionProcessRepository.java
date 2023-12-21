@@ -2,144 +2,116 @@ package com.inquisition.inquisition.repository;
 
 import java.util.List;
 
-import com.inquisition.inquisition.mapper.inquisitionprocess.InquisitionProcessRecordMapper;
-import com.inquisition.inquisition.mapper.inquisitionprocess.InquisitionProcessRecordUnmapper;
+import com.inquisition.inquisition.mapper.caselog.InquisitionCaseLogRecordMapper;
+import com.inquisition.inquisition.mapper.inquisition.InquisitionProcessRecordMapper;
+import com.inquisition.inquisition.model.cases.InquisitionCaseLog;
 import com.inquisition.inquisition.model.inquisition.InquisitionProcess;
+import com.inquisition.inquisition.models.enums.CaseLogStatus;
 import com.inquisition.inquisition.models.routines.FinishInquisitionProcess;
 import com.inquisition.inquisition.models.routines.StartInquisitionProcess;
-import com.inquisition.inquisition.models.tables.AccusationProcess;
-import com.inquisition.inquisition.models.tables.Bible;
-import com.inquisition.inquisition.models.tables.Church;
-import com.inquisition.inquisition.models.tables.Locality;
-import com.inquisition.inquisition.models.tables.Official;
-import com.inquisition.inquisition.models.tables.Person;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.SelectOnConditionStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.inquisition.inquisition.utils.TableAliases.ACCUSATION_INVESTIGATIVE_CASE_TABLE;
+import static com.inquisition.inquisition.utils.TableAliases.ACCUSATION_PROCESS_TABLE;
+import static com.inquisition.inquisition.utils.TableAliases.ACCUSATION_RECORD_TABLE;
+import static com.inquisition.inquisition.utils.TableAliases.BIBLE_TABLE;
+import static com.inquisition.inquisition.utils.TableAliases.CASE_LOG_TABLE;
+import static com.inquisition.inquisition.utils.TableAliases.CHURCH_TABLE;
+import static com.inquisition.inquisition.utils.TableAliases.INQUISITION_PROCESS_TABLE;
+import static com.inquisition.inquisition.utils.TableAliases.INVESTIGATIVE_CASE_TABLE;
+import static com.inquisition.inquisition.utils.TableAliases.LOCALITY_TABLE;
+import static com.inquisition.inquisition.utils.TableAliases.OFFICIAL_TABLE;
+import static com.inquisition.inquisition.utils.TableAliases.PERSON_TABLE;
+
 @Repository
-public class InquisitionProcessRepository implements CrudRepository<InquisitionProcess> {
+public class InquisitionProcessRepository {
     private final DSLContext dsl;
     private final InquisitionProcessRecordMapper inquisitionProcessRecordMapper;
-    private final InquisitionProcessRecordUnmapper inquisitionProcessRecordUnmapper;
-    private static final com.inquisition.inquisition.models.tables.InquisitionProcess INQUISITION_PROCESS =
-            com.inquisition.inquisition.models.tables.InquisitionProcess.INQUISITION_PROCESS;
+    private final InquisitionCaseLogRecordMapper inquisitionCaseLogRecordMapper;
 
     @Autowired
     public InquisitionProcessRepository(DSLContext dsl,
                                         InquisitionProcessRecordMapper inquisitionProcessRecordMapper,
-                                        InquisitionProcessRecordUnmapper inquisitionProcessRecordUnmapper) {
+                                        InquisitionCaseLogRecordMapper inquisitionCaseLogRecordMapper) {
         this.dsl = dsl;
         this.inquisitionProcessRecordMapper = inquisitionProcessRecordMapper;
-        this.inquisitionProcessRecordUnmapper = inquisitionProcessRecordUnmapper;
+        this.inquisitionCaseLogRecordMapper = inquisitionCaseLogRecordMapper;
     }
 
-    @Override
-    public InquisitionProcess insert(InquisitionProcess inquisitionProcess) {
-        return null;
-    }
-
-    @Override
-    public InquisitionProcess update(InquisitionProcess inquisitionProcess) {
-        return null;
-    }
-
-    @Override
-    public InquisitionProcess find(Integer id) {
-        return null;
-    }
-
-    @Override
     public List<InquisitionProcess> findAll(Condition condition) {
-        return dsl.selectFrom(INQUISITION_PROCESS)
+        return dsl.selectFrom(INQUISITION_PROCESS_TABLE)
                 .where(condition)
                 .fetch()
-                .map(r -> r.into(InquisitionProcess.class));
-    }
-
-    public List<InquisitionProcess> findByLocalityId(Integer localityId) {
-        return dsl.select()
-                .from(INQUISITION_PROCESS.as("inquisition"))
-                .leftJoin(Church.CHURCH.as("church"))
-                .on(Church.CHURCH.ID.eq(INQUISITION_PROCESS.CHURCH_ID))
-                .leftJoin(AccusationProcess.ACCUSATION_PROCESS.as("accusation"))
-                .on(AccusationProcess.ACCUSATION_PROCESS.INQUISITION_PROCESS_ID.eq(INQUISITION_PROCESS.ID))
-                .leftJoin(Bible.BIBLE.as("bible"))
-                .on(Bible.BIBLE.VERSION.eq(INQUISITION_PROCESS.BIBLE_ID))
-                .leftJoin(Official.OFFICIAL.as("official"))
-                .on(Official.OFFICIAL.ID.eq(INQUISITION_PROCESS.OFFICIAL_ID))
-                .join(Locality.LOCALITY.as("locality"))
-                .on(Locality.LOCALITY.ID.eq(Church.CHURCH.LOCALITY_ID))
-                .where(Church.CHURCH.LOCALITY_ID.eq(localityId))
-                .fetch()
-                .map(inquisitionProcessRecordMapper::mapFull);
+                .map(inquisitionProcessRecordMapper::mapInquisitionProcess);
     }
 
     @Transactional(readOnly = true)
     public List<InquisitionProcess> findAll() {
-        return dsl.select()
-                .from(INQUISITION_PROCESS.as("inquisition"))
-                .leftJoin(Church.CHURCH.as("church"))
-                .on(Church.CHURCH.as("church").ID.eq(INQUISITION_PROCESS.as("inquisition").CHURCH_ID))
-                .leftJoin(AccusationProcess.ACCUSATION_PROCESS.as("accusation"))
-                .on(AccusationProcess.ACCUSATION_PROCESS.as("accusation").INQUISITION_PROCESS_ID.eq(INQUISITION_PROCESS.as("inquisition").ID))
-                .leftJoin(Bible.BIBLE.as("bible"))
-                .on(Bible.BIBLE.as("bible").VERSION.eq(INQUISITION_PROCESS.as("inquisition").BIBLE_ID))
-                .leftJoin(Official.OFFICIAL.as("official"))
-                .on(Official.OFFICIAL.as("official").ID.eq(INQUISITION_PROCESS.as("inquisition").OFFICIAL_ID))
-                .leftJoin(Person.PERSON.as("person"))
-                .on(Person.PERSON.as("person").ID.eq(Official.OFFICIAL.as("official").PERSON_ID))
-                .join(Locality.LOCALITY.as("locality"))
-                .on(Locality.LOCALITY.as("locality").ID.eq(Church.CHURCH.as("church").LOCALITY_ID))
-                .fetch()
-                .map(inquisitionProcessRecordMapper::mapFull);
-    }
+        return getComplexSelectQuery()
+                .leftJoin(PERSON_TABLE)
+                .on(PERSON_TABLE.ID.eq(OFFICIAL_TABLE.PERSON_ID))
 
-    @Override
-    public Boolean delete(Integer id) {
-        return null;
-    }
-
-    public List<InquisitionProcess> findInProgressByLocalityId(Integer localityId) {
-        return dsl.select()
-                .from(INQUISITION_PROCESS.as("inquisition"))
-                .leftJoin(Church.CHURCH.as("church"))
-                .on(Church.CHURCH.as("church").ID.eq(INQUISITION_PROCESS.as("inquisition").CHURCH_ID))
-                .leftJoin(AccusationProcess.ACCUSATION_PROCESS.as("accusation"))
-                .on(AccusationProcess.ACCUSATION_PROCESS.as("accusation").INQUISITION_PROCESS_ID.eq(INQUISITION_PROCESS.as("inquisition").ID))
-                .leftJoin(Bible.BIBLE.as("bible"))
-                .on(Bible.BIBLE.as("bible").VERSION.eq(INQUISITION_PROCESS.as("inquisition").BIBLE_ID))
-                .leftJoin(Official.OFFICIAL.as("official"))
-                .on(Official.OFFICIAL.as("official").ID.eq(INQUISITION_PROCESS.as("inquisition").OFFICIAL_ID))
-                .join(Locality.LOCALITY.as("locality"))
-                .on(Locality.LOCALITY.as("locality").ID.eq(Church.CHURCH.as("church").LOCALITY_ID))
-                .where(INQUISITION_PROCESS.FINISH_DATA.isNull())
-                .and(Church.CHURCH.LOCALITY_ID.eq(localityId))
                 .fetch()
-                .map(r -> inquisitionProcessRecordMapper.mapFull(r));
+                .map(inquisitionProcessRecordMapper::mapInquisitionProcess);
     }
 
     @Transactional(readOnly = true)
     public List<InquisitionProcess> findInProgressByOfficialId(Integer officialId) {
-        return dsl.select()
-                .from(INQUISITION_PROCESS)
-                .leftJoin(Church.CHURCH)
-                .on(Church.CHURCH.ID.eq(INQUISITION_PROCESS.CHURCH_ID))
-                .leftJoin(AccusationProcess.ACCUSATION_PROCESS)
-                .on(AccusationProcess.ACCUSATION_PROCESS.INQUISITION_PROCESS_ID.eq(INQUISITION_PROCESS.ID))
-                .leftJoin(Bible.BIBLE)
-                .on(Bible.BIBLE.VERSION.eq(INQUISITION_PROCESS.BIBLE_ID))
-                .leftJoin(Official.OFFICIAL)
-                .on(Official.OFFICIAL.ID.eq(INQUISITION_PROCESS.OFFICIAL_ID))
-                .join(Locality.LOCALITY)
-                .on(Locality.LOCALITY.ID.eq(Church.CHURCH.LOCALITY_ID))
-                .where(INQUISITION_PROCESS.FINISH_DATA.isNull())
-                .and(Church.CHURCH.LOCALITY_ID.eq(officialId))
+        return getComplexSelectQuery()
+                .where(INQUISITION_PROCESS_TABLE.FINISH_DATA.isNull())
+                .and(CHURCH_TABLE.LOCALITY_ID.eq(officialId))
+
                 .fetch()
-                .map(inquisitionProcessRecordMapper::mapFull);
+                .map(inquisitionProcessRecordMapper::mapInquisitionProcess);
+    }
+
+    @Transactional(readOnly = true)
+    public List<InquisitionCaseLog> getCasesForDiscussion(Integer inquisitionId) {
+        return getCaseForCondition(DSL.condition(ACCUSATION_PROCESS_TABLE.INQUISITION_PROCESS_ID.eq(inquisitionId))
+                .and(CASE_LOG_TABLE.CASE_STATUS.eq(CaseLogStatus.Conversation))
+                .and(CASE_LOG_TABLE.RESULT.isNull()));
+    }
+
+    @Transactional(readOnly = true)
+    public List<InquisitionCaseLog> getCasesForTorture(Integer inquisitionId) {
+        return getCaseForCondition(DSL.condition(ACCUSATION_PROCESS_TABLE.INQUISITION_PROCESS_ID.eq(inquisitionId))
+                .and(CASE_LOG_TABLE.CASE_STATUS.eq(CaseLogStatus.Torture))
+                .and(CASE_LOG_TABLE.RESULT.isNull()));
+    }
+
+    @Transactional(readOnly = true)
+    public List<InquisitionCaseLog> getCasesForPunishment(Integer inquisitionId) {
+        return getCaseForCondition(DSL.condition(ACCUSATION_PROCESS_TABLE.INQUISITION_PROCESS_ID.eq(inquisitionId))
+                .and(CASE_LOG_TABLE.CASE_STATUS.eq(CaseLogStatus.Punishment))
+                .and(CASE_LOG_TABLE.RESULT.isNull()));
+    }
+
+    private List<InquisitionCaseLog> getCaseForCondition(Condition condition) {
+        return dsl.select()
+                .from(ACCUSATION_PROCESS_TABLE)
+
+                .join(ACCUSATION_RECORD_TABLE)
+                .on(ACCUSATION_RECORD_TABLE.ID_ACCUSATION.eq(ACCUSATION_PROCESS_TABLE.ID))
+
+                .join(ACCUSATION_INVESTIGATIVE_CASE_TABLE)
+                .on(ACCUSATION_INVESTIGATIVE_CASE_TABLE.RECORD_ID.eq(ACCUSATION_RECORD_TABLE.ID))
+
+                .join(INVESTIGATIVE_CASE_TABLE)
+                .on(INVESTIGATIVE_CASE_TABLE.ID.eq(ACCUSATION_INVESTIGATIVE_CASE_TABLE.CASE_ID))
+
+                .join(CASE_LOG_TABLE)
+                .on(CASE_LOG_TABLE.CASE_ID.eq(INVESTIGATIVE_CASE_TABLE.ID))
+
+                .where(condition)
+                .fetch()
+                .map(inquisitionCaseLogRecordMapper::mapInquisitionCaseLog);
     }
 
     @Transactional
@@ -166,22 +138,24 @@ public class InquisitionProcessRepository implements CrudRepository<InquisitionP
         finishInquisitionProcess.execute(dsl.configuration());
         return finishInquisitionProcess.getReturnValue();
     }
+
+    private SelectOnConditionStep<Record> getComplexSelectQuery() {
+        return dsl.select()
+                .from(INQUISITION_PROCESS_TABLE)
+
+                .leftJoin(CHURCH_TABLE)
+                .on(CHURCH_TABLE.ID.eq(INQUISITION_PROCESS_TABLE.CHURCH_ID))
+
+                .leftJoin(ACCUSATION_PROCESS_TABLE)
+                .on(ACCUSATION_PROCESS_TABLE.INQUISITION_PROCESS_ID.eq(INQUISITION_PROCESS_TABLE.ID))
+
+                .leftJoin(BIBLE_TABLE)
+                .on(BIBLE_TABLE.VERSION.eq(INQUISITION_PROCESS_TABLE.BIBLE_ID))
+
+                .leftJoin(OFFICIAL_TABLE)
+                .on(OFFICIAL_TABLE.ID.eq(INQUISITION_PROCESS_TABLE.OFFICIAL_ID))
+
+                .join(LOCALITY_TABLE)
+                .on(LOCALITY_TABLE.ID.eq(CHURCH_TABLE.LOCALITY_ID));
+    }
 }
-//
-//    @Query("SELECT ip FROM inquisition_process ip JOIN ip.church c WHERE c.locality = :localityId AND ip.finishDate
-//    IS NULL")
-//    List<InquisitionProcess> findInProgressByLocalityId(@Param("localityId") Integer localityId);
-//
-//    @Query("SELECT ip FROM inquisition_process ip JOIN ip.church c WHERE c.locality = :localityId")
-//    List<InquisitionProcess> findInquisitionProcessesByLocalityId(@Param("localityId") Integer localityId);
-//
-//    // Define the procedure signature here
-////    @Procedure(name = "start_inquisition_process")
-////    Integer startInquisitionProcess(@Param("cur_official") Integer official, @Param("cur_church") Integer church,
-// @Param("cur_bible") Integer bible);
-//
-//    @Procedure(name = "my_procedure_name")
-//    void callMyProcedure(@Param("input_param") String inputParam);
-//
-//
-//}

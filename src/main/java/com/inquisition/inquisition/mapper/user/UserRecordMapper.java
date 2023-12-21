@@ -3,26 +3,27 @@ package com.inquisition.inquisition.mapper.user;
 import com.inquisition.inquisition.model.user.User;
 import com.inquisition.inquisition.model.user.UserRole;
 import com.inquisition.inquisition.models.enums.UserRoles;
-import com.inquisition.inquisition.models.tables.records.UsersRecord;
-import lombok.RequiredArgsConstructor;
-import org.jooq.RecordMapper;
+import org.jooq.Record;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
-@Component
-public class UserRecordMapper implements RecordMapper<UsersRecord, User> {
+import static com.inquisition.inquisition.utils.TableAliases.USER_TABLE;
 
-    @Override
-    public User map(UsersRecord record) {
-        return new User(
-                record.getPersonId(),
-                record.getUsername(),
-                record.getPassword(),
-                convert(record.getRole())
-        );
+@Component
+public class UserRecordMapper {
+
+    public User mapUser(Record record) {
+        User user = new User();
+
+        user.setId(record.get(USER_TABLE.ID));
+        user.setPersonId(record.get(USER_TABLE.PERSON_ID));
+        user.setUsername(record.get(USER_TABLE.USERNAME));
+        user.setPassword(record.get(USER_TABLE.PASSWORD));
+        user.setRole(convertRole(record.get(USER_TABLE.ROLE)));
+
+        return user;
     }
 
-    private UserRole convert(UserRoles role) {
+    private static UserRole convertRole(UserRoles role) {
         return UserRole.valueOf(role.name().toUpperCase());
     }
 }

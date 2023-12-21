@@ -1,54 +1,80 @@
-package com.inquisition.inquisition.service.impl;
+package com.inquisition.inquisition.service;
 
+import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.inquisition.inquisition.model.accusation.AccusationProcess;
+import com.inquisition.inquisition.model.accusation.AccusationRecordFull;
+import com.inquisition.inquisition.model.accusation.AccusationRecordFullWithCaseId;
+import com.inquisition.inquisition.model.accusation.AccusationRecordWithCasePayload;
+import com.inquisition.inquisition.model.bible.Bible;
 import com.inquisition.inquisition.model.inquisition.InquisitionProcess;
+import com.inquisition.inquisition.model.inquisition.InquisitionProcessIdContainer;
 import com.inquisition.inquisition.model.inquisition.InquisitionProcessPayload;
 import com.inquisition.inquisition.model.inquisition.InquisitionProcessStartContainer;
 import com.inquisition.inquisition.model.inquisition.StartInquisitionProcessRepContainer;
+import com.inquisition.inquisition.model.locality.Locality;
 import com.inquisition.inquisition.model.official.Official;
 import com.inquisition.inquisition.model.payload.BasePayload;
 import com.inquisition.inquisition.model.payload.Payload;
 import com.inquisition.inquisition.model.payload.PayloadWithCollection;
 import com.inquisition.inquisition.model.payload.PayloadWithData;
 import com.inquisition.inquisition.model.user.User;
+import com.inquisition.inquisition.repository.AccusationProcessRepository;
 import com.inquisition.inquisition.repository.AccusationRecordRepository;
+import com.inquisition.inquisition.repository.BibleRepository;
 import com.inquisition.inquisition.repository.InquisitionProcessRepository;
+import com.inquisition.inquisition.repository.LocalityRepository;
 import com.inquisition.inquisition.repository.OfficialRepository;
 import com.inquisition.inquisition.repository.QueryFetchHelper;
 import com.inquisition.inquisition.security.UserDetailsServiceImpl;
-import com.inquisition.inquisition.service.intr.InquisitionService;
 import com.inquisition.inquisition.utils.InquisitionProcessConverter;
 import com.nimbusds.jose.util.Pair;
 import org.springframework.stereotype.Service;
 
 import static com.inquisition.inquisition.utils.InquisitionProcessConverter.convertToCurrentPayload;
+import static com.inquisition.inquisition.utils.Messages.INCORRECT_REQUEST;
 
 @Service
-public class InquisitionServiceImpl implements InquisitionService {
+public class InquisitionService {
     private final InquisitionProcessRepository inquisitionProcessRepository;
     private final AccusationRecordRepository accusationRecordRepository;
-
+    private final AccusationProcessRepository accusationProcessRepository;
     private final OfficialRepository officialRepository;
     private final UserDetailsServiceImpl userDetailsService;
+    private final BibleRepository bibleRepository;
+    private final LocalityRepository localityRepository;
 
-    public InquisitionServiceImpl(InquisitionProcessRepository inquisitionProcessRepository,
-                                  AccusationRecordRepository accusationRecordRepository,
-                                  OfficialRepository officialRepository,
-                                  UserDetailsServiceImpl userDetailsService) {
+    public InquisitionService(InquisitionProcessRepository inquisitionProcessRepository,
+                              AccusationRecordRepository accusationRecordRepository,
+                              OfficialRepository officialRepository,
+                              UserDetailsServiceImpl userDetailsService,
+                              AccusationProcessRepository accusationProcessRepository,
+                              BibleRepository bibleRepository, LocalityRepository localityRepository) {
         this.inquisitionProcessRepository = inquisitionProcessRepository;
         this.accusationRecordRepository = accusationRecordRepository;
         this.officialRepository = officialRepository;
         this.userDetailsService = userDetailsService;
+        this.accusationProcessRepository = accusationProcessRepository;
+        this.bibleRepository = bibleRepository;
+        this.localityRepository = localityRepository;
     }
 
-    @Override
     public Payload startProcess(InquisitionProcessStartContainer container) {
         User user = userDetailsService.getUser();
         Official official = officialRepository.getCurrentByPersonId(user.getPersonId());
+        Bible bible = bibleRepository.find(container.getBibleId());
+        Locality locality = localityRepository.find(container.getLocalityId());
+
+        if (bible == null) {
+            return new BasePayload(400, "Такой Библии не существует");
+        }
+        if (locality == null) {
+            return new BasePayload(400, "Такой местности не существует");
+        }
+
         StartInquisitionProcessRepContainer repContainer = new StartInquisitionProcessRepContainer(
                 official.getId(),
                 container.getLocalityId(),
@@ -66,12 +92,11 @@ public class InquisitionServiceImpl implements InquisitionService {
 
         Integer processId = helper.fetch();
         if (processId == null) {
-            return new BasePayload(400, "Incorrect request");
+            return new BasePayload(400, INCORRECT_REQUEST);
         }
         return new PayloadWithData<>(200, processId);
     }
 
-    @Override
     public Payload getCurrentInquisitionProcess(Integer officialId) {
         QueryFetchHelper<Integer, List<InquisitionProcess>> helper = new QueryFetchHelper<>(
                 officialId,
@@ -80,7 +105,7 @@ public class InquisitionServiceImpl implements InquisitionService {
 
         List<InquisitionProcess> processes = helper.fetch();
         if (processes == null || processes.isEmpty()) {
-            return new BasePayload(404, "Inquisition process not found.");
+            return new BasePayload(404, "Инквизиционный процесс не найден");
         }
 
         InquisitionProcess process = processes.get(0);
@@ -93,8 +118,7 @@ public class InquisitionServiceImpl implements InquisitionService {
     private int defineStepOfProcess(InquisitionProcess process) {
         int step;
         AccusationProcess accusationProcess = process.getAccusationProcess();
-
-        if (accusationProcess == null) {
+        if (isFullNull(accusationProcess)) {
             step = 0;
         } else if (accusationProcess.getFinishTime() == null) {
             step = 1;
@@ -140,5 +164,59 @@ public class InquisitionServiceImpl implements InquisitionService {
                 )
                 .toList();
         return new PayloadWithCollection<>(200, "", payload);
+    }
+
+    public Payload getAllCases(Integer accusationId) {
+        AccusationProcess process = accusationProcessRepository.find(accusationId);
+        if (process == null) {
+            return new BasePayload(400, "Не найден процесс сбора доносов с id " + accusationId);
+        }
+        QueryFetchHelper<Integer, List<AccusationRecordFullWithCaseId>> helper = new QueryFetchHelper<>(
+                accusationId,
+                accusationRecordRepository::getNotResolvedAccusationRecordWithCases
+        );
+        List<AccusationRecordFullWithCaseId> records = helper.fetch();
+        Map<Integer, List<AccusationRecordFullWithCaseId>> recordsByCaseId =
+                records.stream().collect(Collectors.groupingBy(AccusationRecordFullWithCaseId::getCaseId));
+        Map<Integer, AccusationRecordWithCasePayload> payloadMap = recordsByCaseId.entrySet().stream()
+                .map(entry -> {
+                            var key = entry.getKey();
+                            var value = entry.getValue();
+
+                            AccusationRecordWithCasePayload payload = new AccusationRecordWithCasePayload();
+                            AccusationRecordFullWithCaseId first = value.get(0);
+
+                            payload.setId(key);
+                            payload.setAccused(first.getAccused().getName() + " " + first.getAccused().getSurname());
+                            payload.setCreationDate(first.getCreationDate());
+                            payload.setDescription(value.stream().map(AccusationRecordFull::getDescription).collect(Collectors.joining(", ")));
+                            return new AbstractMap.SimpleEntry<>(key, payload);
+                        }
+                )
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+//        List<Integer> caseIds = payloadMap.keySet().stream().toList();
+//        Map<Integer, List<CaseLog>> caseLogs = investigativeCaseRepository.getCaseLogs(caseIds).stream().collect
+//        (Collectors.groupingBy(CaseLog::getCaseId));
+        return new PayloadWithCollection<>(200, payloadMap.values());
+    }
+
+    private boolean isFullNull(AccusationProcess process) {
+        return process == null ||
+                (process.getId() == null && process.getInquisitionProcessId() == null &&
+                        process.getStartTime() == null && process.getFinishTime() == null);
+    }
+
+    public Payload finishProcess(InquisitionProcessIdContainer container) {
+        QueryFetchHelper<Integer, Integer> helper = new QueryFetchHelper<>(
+                container.getInquisitionId(),
+                inquisitionProcessRepository::finishInquisitionProcess
+        );
+
+        Integer processId = helper.fetch();
+        if (processId == null) {
+            return new BasePayload(400, INCORRECT_REQUEST);
+        }
+        return new PayloadWithData<>(200, processId);
     }
 }

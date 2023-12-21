@@ -18,13 +18,4 @@ public enum Gender {
     public String getDisplayName() {
         return displayName;
     }
-
-//    public static Gender valueOf(String id) {
-//        for (Gender value : Gender.values()) {
-//            if (value.id == id) {
-//                return value;
-//            }
-//        }
-//        throw new IllegalArgumentException("Invalid MyEnum id: " + id);
-//    }
 }

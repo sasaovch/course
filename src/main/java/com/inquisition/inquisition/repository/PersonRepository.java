@@ -13,12 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.inquisition.inquisition.utils.TableAliases.PERSON_TABLE;
+
 @Repository
 public class PersonRepository {
     private final DSLContext dsl;
     private final PersonRecordMapper personRecordMapper;
-    private static final com.inquisition.inquisition.models.tables.Person PERSON =
-            com.inquisition.inquisition.models.tables.Person.PERSON;
 
     @Autowired
     public PersonRepository(DSLContext dsl, PersonRecordMapper personRecordMapper) {
@@ -28,28 +28,28 @@ public class PersonRepository {
 
     @Transactional(readOnly = true)
     public Person find(Integer id) {
-        return dsl.selectFrom(PERSON)
-                .where(PERSON.ID.eq(id))
+        return dsl.selectFrom(PERSON_TABLE)
+                .where(PERSON_TABLE.ID.eq(id))
                 .fetchOptional()
-                .map(personRecordMapper::map)
+                .map(personRecordMapper::mapPerson)
                 .orElse(null);
     }
 
     @Transactional(readOnly = true)
     public Person findByCondition(Condition condition) {
-        return dsl.selectFrom(PERSON)
+        return dsl.selectFrom(PERSON_TABLE)
                 .where(condition)
                 .fetchOptional()
-                .map(personRecordMapper::map)
+                .map(personRecordMapper::mapPerson)
                 .orElse(null);
     }
 
     @Transactional(readOnly = true)
     public List<Person> findAll(Condition condition) {
-        return dsl.selectFrom(PERSON)
+        return dsl.selectFrom(PERSON_TABLE)
                 .where(condition)
                 .fetch()
-                .map(personRecordMapper::map);
+                .map(personRecordMapper::mapPerson);
     }
 
     public static Condition allFieldsExceptId(
@@ -62,14 +62,14 @@ public class PersonRepository {
         com.inquisition.inquisition.models.enums.Gender genderModels =
                 com.inquisition.inquisition.models.enums.Gender.valueOf(gender.toString().toUpperCase());
         return DSL
-                .condition(PERSON.NAME.eq(name))
-                .and(PERSON.SURNAME.eq(surname))
-                .and(PERSON.BIRTH_DATE.eq(birthDate))
-                .and(PERSON.PERSON_GENDER.eq(genderModels))
-                .and(PERSON.LOCALITY_ID.eq(localityId));
+                .condition(PERSON_TABLE.NAME.eq(name))
+                .and(PERSON_TABLE.SURNAME.eq(surname))
+                .and(PERSON_TABLE.BIRTH_DATE.eq(birthDate))
+                .and(PERSON_TABLE.PERSON_GENDER.eq(genderModels))
+                .and(PERSON_TABLE.LOCALITY_ID.eq(localityId));
     }
 
     public static Condition byLocalityId(Integer localityId) {
-        return DSL.condition(PERSON.LOCALITY_ID.eq(localityId));
+        return DSL.condition(PERSON_TABLE.LOCALITY_ID.eq(localityId));
     }
 }
