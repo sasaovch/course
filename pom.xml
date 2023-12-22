@@ -146,9 +146,11 @@
 				<configuration>
 					<jdbc>  <!-- указываем настройки базы -->
 						<driver>org.postgresql.Driver</driver>
-						<url>jdbc:postgresql://localhost:5432/inquisition</url>
-						<user>yt</user>
-						<password>yt</password>
+						<url>jdbc:postgresql://localhost:5432/studs</url>
+<!--						<user>yt</user>-->
+<!--						<password>yt</password>-->
+						<user>s336768</user>
+						<password>LM1MIfIpxzhKmEYl</password>
 					</jdbc>
 					<generator>
 						<database>
@@ -156,7 +158,7 @@
 							<excludes>  <!-- исключаемые подпакеты и файлы -->
 								flyway_schema_history
 							</excludes>
-							<inputSchema>public</inputSchema>  <!-- схема -->
+							<inputSchema>s336768</inputSchema>  <!-- схема -->
 						</database>
 						<generate>
 							<records>true</records>

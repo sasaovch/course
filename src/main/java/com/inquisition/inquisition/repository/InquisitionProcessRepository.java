@@ -45,13 +45,6 @@ public class InquisitionProcessRepository {
         this.inquisitionCaseLogRecordMapper = inquisitionCaseLogRecordMapper;
     }
 
-    public List<InquisitionProcess> findAll(Condition condition) {
-        return dsl.selectFrom(INQUISITION_PROCESS_TABLE)
-                .where(condition)
-                .fetch()
-                .map(inquisitionProcessRecordMapper::mapInquisitionProcess);
-    }
-
     @Transactional(readOnly = true)
     public List<InquisitionProcess> findAll() {
         return getComplexSelectQuery()
@@ -59,7 +52,7 @@ public class InquisitionProcessRepository {
                 .on(PERSON_TABLE.ID.eq(OFFICIAL_TABLE.PERSON_ID))
 
                 .fetch()
-                .map(inquisitionProcessRecordMapper::mapInquisitionProcess);
+                .map(inquisitionProcessRecordMapper::mapInquisitionProcessWithPerson);
     }
 
     @Transactional(readOnly = true)

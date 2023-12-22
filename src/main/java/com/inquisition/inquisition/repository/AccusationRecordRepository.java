@@ -138,10 +138,10 @@ public class AccusationRecordRepository {
     }
 
     @Transactional
-    public void connectCommandment(Integer commandment, Integer recordId) {
-        dsl.insertInto(Violation.VIOLATION)
+    public boolean connectCommandment(Integer commandment, Integer recordId) {
+        return dsl.insertInto(Violation.VIOLATION)
                 .set(Violation.VIOLATION.COMMANDMENT_ID, commandment)
                 .set(Violation.VIOLATION.RECORD_ID, recordId)
-                .execute();
+                .execute() > 0;
     }
 }

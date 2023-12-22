@@ -66,10 +66,36 @@ public class InquisitionProcessRecordMapper {
         process.setChurch(church);
         process.setBible(bible);
 
-        if (record.indexOf(PERSON_TABLE.ID) != 0) {
-            Person person = personRecordMapper.mapPerson(record);
-            official.setPerson(person);
-        }
+        process.setOfficial(official);
+        return process;
+    }
+
+    public InquisitionProcess mapInquisitionProcessWithPerson(Record record) {
+        InquisitionProcess process = new InquisitionProcess();
+        Integer id = record.get(INQUISITION_PROCESS_TABLE.ID);
+        LocalDate startDate =
+                record.get(INQUISITION_PROCESS_TABLE.START_DATA);
+        LocalDate finishDate =
+                record.get(INQUISITION_PROCESS_TABLE.FINISH_DATA);
+
+        process.setId(id);
+        process.setStartData(startDate);
+        process.setFinishData(finishDate);
+
+        AccusationProcess accusationProcess = accusationRecordMapper.mapAccusationProcess(record);
+        Church church = churchRecordMapper.mapChurch(record);
+        Locality locality = localityRecordMapper.mapLocality(record);
+        Official official = officialRecordMapper.mapOfficial(record);
+        Bible bible = bibleRecordMapper.mapBible(record);
+
+        process.setAccusationProcess(accusationProcess);
+        church.setLocality(locality);
+        process.setChurch(church);
+        process.setBible(bible);
+
+        Person person = personRecordMapper.mapPerson(record);
+        official.setPerson(person);
+
         process.setOfficial(official);
         return process;
     }

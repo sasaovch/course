@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import static com.inquisition.inquisition.utils.Messages.DONE;
 import static com.inquisition.inquisition.utils.Messages.ERROR_WHILE_HANDLE_REQUEST;
+import static com.inquisition.inquisition.utils.Messages.INCORRECT_REQUEST;
 
 @Service
 public class AccusationProcessService {
@@ -146,9 +147,11 @@ public class AccusationProcessService {
     }
 
     public Payload connectCommandment(ConnectCommandmentContainer container, Integer recordId) {
-        container.getCommandments().forEach(commandment ->
+        if (container.getCommandments().stream().allMatch(commandment ->
                 accusationRecordRepository.connectCommandment(commandment, recordId)
-        );
-        return new BasePayload(200, DONE);
+        )) {
+            return new BasePayload(200, DONE);
+        }
+        return new BasePayload(400, INCORRECT_REQUEST);
     }
 }
