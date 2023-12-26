@@ -9,8 +9,8 @@ import com.inquisition.inquisition.model.accusation.AccusationRecord;
 import com.inquisition.inquisition.model.accusation.AccusationRecordFull;
 import com.inquisition.inquisition.model.accusation.AccusationRecordFullWithCaseId;
 import com.inquisition.inquisition.models.routines.AddAccusationRecord;
+import com.inquisition.inquisition.models.routines.ConnectCommandmentWithRecord;
 import com.inquisition.inquisition.models.tables.GetNotResolvedAccusationRecord;
-import com.inquisition.inquisition.models.tables.Violation;
 import com.nimbusds.jose.util.Pair;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -50,7 +50,7 @@ public class AccusationRecordRepository {
         return dsl.select(result.GET_NOT_RESOLVED_ACCUSATION_RECORD_)
                 .from(result)
                 .fetch()
-                .map(accusationRecordMapper::mapAccusationRecord);
+                .map(accusationRecordMapper::mapNotResolvedAccusationRecordId);
     }
 
     @Transactional(readOnly = true)
@@ -138,10 +138,10 @@ public class AccusationRecordRepository {
     }
 
     @Transactional
-    public boolean connectCommandment(Integer commandment, Integer recordId) {
-        return dsl.insertInto(Violation.VIOLATION)
-                .set(Violation.VIOLATION.COMMANDMENT_ID, commandment)
-                .set(Violation.VIOLATION.RECORD_ID, recordId)
-                .execute() > 0;
+    public void connectCommandment(Integer commandment, Integer recordId) {
+        ConnectCommandmentWithRecord helper = new ConnectCommandmentWithRecord();
+        helper.setCurCommandmentId(commandment);
+        helper.setCurRecordId(recordId);
+        helper.execute(dsl.configuration());
     }
 }

@@ -2,6 +2,7 @@ package com.inquisition.inquisition.mapper.accusation;
 
 import com.inquisition.inquisition.model.accusation.AccusationProcess;
 import com.inquisition.inquisition.model.accusation.AccusationRecord;
+import com.inquisition.inquisition.models.tables.GetNotResolvedAccusationRecord;
 import org.jooq.Record;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +32,14 @@ public class AccusationRecordMapper {
         accusationRecord.setViolationTime(record.get(ACCUSATION_RECORD_TABLE.VIOLATION_TIME));
         accusationRecord.setDescription(record.get(ACCUSATION_RECORD_TABLE.DESCRIPTION));
         accusationRecord.setIdAccusation(record.get(ACCUSATION_RECORD_TABLE.ID_ACCUSATION));
+
+        return accusationRecord;
+    }
+
+    public AccusationRecord mapNotResolvedAccusationRecordId(Record record) {
+        AccusationRecord accusationRecord = new AccusationRecord();
+
+        accusationRecord.setId(record.get(GetNotResolvedAccusationRecord.GET_NOT_RESOLVED_ACCUSATION_RECORD.GET_NOT_RESOLVED_ACCUSATION_RECORD_));
 
         return accusationRecord;
     }

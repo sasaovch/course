@@ -59,6 +59,15 @@ public class UserRepository {
     }
 
     @Transactional(readOnly = true)
+    public User findByPerson(Integer personId) {
+        return dsl.selectFrom(USER_TABLE)
+                .where(USER_TABLE.PERSON_ID.eq(personId))
+                .fetchOptional()
+                .map(userRecordMapper::mapUser)
+                .orElse(null);
+    }
+
+    @Transactional(readOnly = true)
     public List<User> findAll(Condition condition) {
         return dsl.selectFrom(USER_TABLE)
                 .where(condition)

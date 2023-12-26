@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 public class Church {
-    private Long id;
+    private Integer id;
     private String name;
     private LocalDate foundationDate;
     private Locality locality;

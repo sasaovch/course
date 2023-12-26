@@ -6,12 +6,14 @@ import com.inquisition.inquisition.model.inquisition.InquisitionProcessPayload;
 import com.inquisition.inquisition.model.person.Person;
 
 public final class InquisitionProcessConverter {
+    private InquisitionProcessConverter() {}
     public static CurrentInquisitionProcessPayload convertToCurrentPayload(InquisitionProcess process, Integer step) {
         CurrentInquisitionProcessPayload payload = new CurrentInquisitionProcessPayload();
         payload.setId(process.getId());
         payload.setLocality(process.getChurch().getLocality().getName());
         payload.setBible(process.getBible().getName());
         payload.setStep(step);
+        payload.setCurrentAccusationProcess(process.getAccusationProcess().getId());
         return payload;
     }
 

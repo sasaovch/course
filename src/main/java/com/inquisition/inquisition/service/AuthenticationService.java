@@ -62,7 +62,7 @@ public class AuthenticationService {
     public Payload authenticateUser(LoginUser loginUser) {
         User user = userRepository.findByUsername(loginUser.getUsername());
         if (user == null) {
-            return new BasePayload(400, "User with username doesn't exist.");
+            return new BasePayload(400, "Пользователь не найден.");
         }
 
         LoginedUser loginedUser = login(user.getUsername(), loginUser.getPassword());
@@ -80,7 +80,8 @@ public class AuthenticationService {
                 loginedUser.jwtToken(),
                 person.getId(),
                 officialId,
-                person.getName() + " " + person.getSurname()
+                person.getName() + " " + person.getSurname(),
+                person.getLocalityId()
         );
 
         return new PayloadWithUser(200, userDTO);
@@ -88,12 +89,12 @@ public class AuthenticationService {
 
     public Payload registerUser(SignupUser signupUser) {
         if (Boolean.TRUE.equals(userRepository.existsByUsername(signupUser.getUsername()))) {
-            return new BasePayload(400, "User with username already exists.");
+            return new BasePayload(400, "Имя пользователя уже занято.");
         }
 
         Locality locality = localityRepository.find(signupUser.getLocality());
         if (locality == null) {
-            return new BasePayload(400, "Locality not found.");
+            return new BasePayload(400, "Местность не найдена.");
         }
 
         Person person = personRepository.findByCondition(
@@ -106,7 +107,10 @@ public class AuthenticationService {
                 )
         );
         if (person == null) {
-            return new BasePayload(400, "User with name not found.");
+            return new BasePayload(400, "Пользователь не найден.");
+        }
+        if (userRepository.findByPerson(person.getId()) != null) {
+            return new BasePayload(400, "Аккаунт уже существует");
         }
 
         Official official = officialRepository.getCurrentByPersonId(person.getId());
@@ -130,7 +134,8 @@ public class AuthenticationService {
                 loginedUser.jwtToken(),
                 person.getId(),
                 officialId,
-                person.getName() + " " + person.getSurname()
+                person.getName() + " " + person.getSurname(),
+                person.getLocalityId()
         );
 
         return new PayloadWithUser(200, userDTO);

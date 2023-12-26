@@ -49,8 +49,19 @@ public class InquisitionProcessController {
     }
 
     @GetMapping("/getCurrent/{official_id}")
+    @PreAuthorize("hasAnyAuthority('INQUISITOR')")
     public ResponseEntity<Payload> getCurrentProcess(@PathVariable("official_id") Integer officialId) {
-        Payload payload = inquisitionService.getCurrentInquisitionProcess(officialId);
+        Payload payload = inquisitionService.getCurrentInquisitionProcessForInquisitor(officialId);
+        if (payload.code() != 200) {
+            return ResponseEntity.badRequest().body(payload);
+        }
+        return ResponseEntity.ok(payload);
+    }
+
+    @GetMapping("/getCurrentForPerson")
+    @PreAuthorize("hasAnyAuthority('BISHOP', 'INQUISITOR', 'USER', 'SECULAR_AUTHORITY')")
+    public ResponseEntity<Payload> getCurrentProcessForBishop() {
+        Payload payload = inquisitionService.getCurrentInquisitionProcessForBishop();
         if (payload.code() != 200) {
             return ResponseEntity.badRequest().body(payload);
         }

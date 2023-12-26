@@ -19,6 +19,7 @@ public class PersonServiceImpl {
     public Payload getPersonByLocality(Integer localityId) {
         List<Person> persons = personRepository.findAll(
                 PersonRepository.byLocalityId(localityId));
+        persons.forEach(person -> person.setName(person.getSurname()  + " " + person.getName()));
         return new PayloadWithCollection<>(200, "", persons);
     }
 }

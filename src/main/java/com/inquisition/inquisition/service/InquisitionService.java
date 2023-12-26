@@ -10,6 +10,8 @@ import com.inquisition.inquisition.model.accusation.AccusationRecordFull;
 import com.inquisition.inquisition.model.accusation.AccusationRecordFullWithCaseId;
 import com.inquisition.inquisition.model.accusation.AccusationRecordWithCasePayload;
 import com.inquisition.inquisition.model.bible.Bible;
+import com.inquisition.inquisition.model.church.Church;
+import com.inquisition.inquisition.model.inquisition.CurrentInquisitionProcessPayload;
 import com.inquisition.inquisition.model.inquisition.InquisitionProcess;
 import com.inquisition.inquisition.model.inquisition.InquisitionProcessIdContainer;
 import com.inquisition.inquisition.model.inquisition.InquisitionProcessPayload;
@@ -21,17 +23,21 @@ import com.inquisition.inquisition.model.payload.BasePayload;
 import com.inquisition.inquisition.model.payload.Payload;
 import com.inquisition.inquisition.model.payload.PayloadWithCollection;
 import com.inquisition.inquisition.model.payload.PayloadWithData;
+import com.inquisition.inquisition.model.person.Person;
 import com.inquisition.inquisition.model.user.User;
 import com.inquisition.inquisition.repository.AccusationProcessRepository;
 import com.inquisition.inquisition.repository.AccusationRecordRepository;
 import com.inquisition.inquisition.repository.BibleRepository;
+import com.inquisition.inquisition.repository.ChurchRepository;
 import com.inquisition.inquisition.repository.InquisitionProcessRepository;
 import com.inquisition.inquisition.repository.LocalityRepository;
 import com.inquisition.inquisition.repository.OfficialRepository;
+import com.inquisition.inquisition.repository.PersonRepository;
 import com.inquisition.inquisition.repository.QueryFetchHelper;
 import com.inquisition.inquisition.security.UserDetailsServiceImpl;
 import com.inquisition.inquisition.utils.InquisitionProcessConverter;
 import com.nimbusds.jose.util.Pair;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.inquisition.inquisition.utils.InquisitionProcessConverter.convertToCurrentPayload;
@@ -46,13 +52,18 @@ public class InquisitionService {
     private final UserDetailsServiceImpl userDetailsService;
     private final BibleRepository bibleRepository;
     private final LocalityRepository localityRepository;
+    private final PersonRepository personRepository;
+    @Autowired
+    private ChurchRepository churchRepository;
 
     public InquisitionService(InquisitionProcessRepository inquisitionProcessRepository,
                               AccusationRecordRepository accusationRecordRepository,
                               OfficialRepository officialRepository,
                               UserDetailsServiceImpl userDetailsService,
                               AccusationProcessRepository accusationProcessRepository,
-                              BibleRepository bibleRepository, LocalityRepository localityRepository) {
+                              BibleRepository bibleRepository,
+                              LocalityRepository localityRepository,
+                              PersonRepository personRepository) {
         this.inquisitionProcessRepository = inquisitionProcessRepository;
         this.accusationRecordRepository = accusationRecordRepository;
         this.officialRepository = officialRepository;
@@ -60,6 +71,7 @@ public class InquisitionService {
         this.accusationProcessRepository = accusationProcessRepository;
         this.bibleRepository = bibleRepository;
         this.localityRepository = localityRepository;
+        this.personRepository = personRepository;
     }
 
     public Payload startProcess(InquisitionProcessStartContainer container) {
@@ -97,15 +109,37 @@ public class InquisitionService {
         return new PayloadWithData<>(200, processId);
     }
 
-    public Payload getCurrentInquisitionProcess(Integer officialId) {
+    public Payload getCurrentInquisitionProcessForInquisitor(Integer officialId) {
         QueryFetchHelper<Integer, List<InquisitionProcess>> helper = new QueryFetchHelper<>(
                 officialId,
                 inquisitionProcessRepository::findInProgressByOfficialId
         );
 
+        return getCurrentInquisitionProcess(helper);
+    }
+
+    public Payload getCurrentInquisitionProcessForBishop() {
+        User user = userDetailsService.getUser();
+        Official official = officialRepository.getCurrentByPersonId(user.getPersonId());
+        Person person = personRepository.find(official.getPersonId());
+
+        Church church = churchRepository.findByLocality(person.getLocalityId());
+
+        QueryFetchHelper<Integer, List<InquisitionProcess>> helper = new QueryFetchHelper<>(
+                church.getId(),
+                inquisitionProcessRepository::findInProgressByChurchId
+        );
+
+        return getCurrentInquisitionProcess(helper);
+    }
+
+    private Payload getCurrentInquisitionProcess(QueryFetchHelper<Integer, List<InquisitionProcess>> helper) {
         List<InquisitionProcess> processes = helper.fetch();
         if (processes == null || processes.isEmpty()) {
-            return new BasePayload(404, "Инквизиционный процесс не найден");
+            CurrentInquisitionProcessPayload process = new CurrentInquisitionProcessPayload();
+            process.setId(0);
+            process.setCurrentAccusationProcess(0);
+            return new PayloadWithData<>(200, process);
         }
 
         InquisitionProcess process = processes.get(0);

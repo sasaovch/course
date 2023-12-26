@@ -1,8 +1,6 @@
 package com.inquisition.inquisition.model.inquisition;
 
-import com.inquisition.inquisition.model.payload.Payload;
 import lombok.Data;
-import lombok.Getter;
 
 @Data
 public class CurrentInquisitionProcessPayload {
@@ -10,4 +8,5 @@ public class CurrentInquisitionProcessPayload {
     private String bible;
     private String locality;
     private Integer step;
+    private Integer currentAccusationProcess;
 }

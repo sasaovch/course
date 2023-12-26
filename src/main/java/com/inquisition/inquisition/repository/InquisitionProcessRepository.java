@@ -66,6 +66,16 @@ public class InquisitionProcessRepository {
     }
 
     @Transactional(readOnly = true)
+    public List<InquisitionProcess> findInProgressByChurchId(Integer churchId) {
+        return getComplexSelectQuery()
+                .where(INQUISITION_PROCESS_TABLE.FINISH_DATA.isNull())
+                .and(INQUISITION_PROCESS_TABLE.CHURCH_ID.eq(churchId))
+
+                .fetch()
+                .map(inquisitionProcessRecordMapper::mapInquisitionProcess);
+    }
+
+    @Transactional(readOnly = true)
     public List<InquisitionCaseLog> getCasesForDiscussion(Integer inquisitionId) {
         return getCaseForCondition(DSL.condition(ACCUSATION_PROCESS_TABLE.INQUISITION_PROCESS_ID.eq(inquisitionId))
                 .and(CASE_LOG_TABLE.CASE_STATUS.eq(CaseLogStatus.Conversation))

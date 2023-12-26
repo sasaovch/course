@@ -6,6 +6,7 @@ public record UserDTO(
         String jwt,
         Integer personId,
         Integer officialId,
-        String personName
+        String personName,
+        Integer localityId
 ) {
 }

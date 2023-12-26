@@ -24,7 +24,6 @@ public class OfficialRepository {
     public Official getCurrentByPersonId(Integer personId) {
         return dsl.selectFrom(OFFICIAL_TABLE)
                 .where(OFFICIAL_TABLE.PERSON_ID.eq(personId))
-                .and(OFFICIAL_TABLE.FIRED_DATE.isNull())
                 .fetchOptional()
                 .map(officialRecordMapper::mapOfficial)
                 .orElse(null);
