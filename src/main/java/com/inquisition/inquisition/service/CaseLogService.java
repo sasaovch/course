@@ -73,7 +73,7 @@ public class CaseLogService {
                 inquisitionId,
                 sqlRequest
         );
-        List<InquisitionCaseLog> caseLogs = helper.fetch();
+        List<InquisitionCaseLog> caseLogs = helper.fetch().getFirst();
         if (caseLogs == null) {
             return new BasePayload(400, ERROR_WHILE_HANDLE_REQUEST);
         }

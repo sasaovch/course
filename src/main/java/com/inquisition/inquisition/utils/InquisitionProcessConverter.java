@@ -10,8 +10,8 @@ public final class InquisitionProcessConverter {
     public static CurrentInquisitionProcessPayload convertToCurrentPayload(InquisitionProcess process, Integer step) {
         CurrentInquisitionProcessPayload payload = new CurrentInquisitionProcessPayload();
         payload.setId(process.getId());
-        payload.setLocality(process.getChurch().getLocality().getName());
-        payload.setBible(process.getBible().getName());
+        payload.setBible(process.getBible().getVersion());
+        payload.setLocality(process.getChurch().getLocality().getId());
         payload.setStep(step);
         payload.setCurrentAccusationProcess(process.getAccusationProcess().getId());
         return payload;

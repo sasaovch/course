@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.inquisition.inquisition.Pair;
 import com.inquisition.inquisition.model.accusation.AccusationProcess;
 import com.inquisition.inquisition.model.accusation.AccusationRecordFull;
 import com.inquisition.inquisition.model.accusation.AccusationRecordFullWithCaseId;
@@ -36,7 +37,6 @@ import com.inquisition.inquisition.repository.PersonRepository;
 import com.inquisition.inquisition.repository.QueryFetchHelper;
 import com.inquisition.inquisition.security.UserDetailsServiceImpl;
 import com.inquisition.inquisition.utils.InquisitionProcessConverter;
-import com.nimbusds.jose.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -102,8 +102,11 @@ public class InquisitionService {
                 )
         );
 
-        Integer processId = helper.fetch();
+        Pair<Integer, String> pair = helper.fetch();
+        Integer processId = pair.getFirst();
+        String messageRes = pair.getSecond();
         if (processId == null) {
+            if (messageRes != null) return new BasePayload(400, messageRes);
             return new BasePayload(400, INCORRECT_REQUEST);
         }
         return new PayloadWithData<>(200, processId);
@@ -134,7 +137,7 @@ public class InquisitionService {
     }
 
     private Payload getCurrentInquisitionProcess(QueryFetchHelper<Integer, List<InquisitionProcess>> helper) {
-        List<InquisitionProcess> processes = helper.fetch();
+        List<InquisitionProcess> processes = helper.fetch().getFirst();
         if (processes == null || processes.isEmpty()) {
             CurrentInquisitionProcessPayload process = new CurrentInquisitionProcessPayload();
             process.setId(0);
@@ -171,14 +174,14 @@ public class InquisitionService {
                 null,
                 id -> inquisitionProcessRepository.findAll()
         );
-        List<InquisitionProcess> processes = helperInqRep.fetch();
+        List<InquisitionProcess> processes = helperInqRep.fetch().getFirst();
         List<Integer> accusationProcessIds = processes.stream().map(k -> k.getAccusationProcess().getId()).toList();
 
         QueryFetchHelper<List<Integer>, List<Pair<Integer, Integer>>> helperAccRep = new QueryFetchHelper<>(
                 accusationProcessIds,
                 accusationRecordRepository::findAllCases
         );
-        List<Pair<Integer, Integer>> accusationProcessToCountCases = helperAccRep.fetch();
+        List<Pair<Integer, Integer>> accusationProcessToCountCases = helperAccRep.fetch().getFirst();
         Map<Integer, List<InquisitionProcess>> processById = processes.stream()
                 .collect(Collectors.groupingBy(InquisitionProcess::getId));
 
@@ -189,8 +192,8 @@ public class InquisitionService {
                                     .map(r -> r.getAccusationProcess().getId()).collect(Collectors.toSet());
 
                             var caseCount = accusationProcessToCountCases.stream()
-                                    .filter(pair -> accusationIds.contains(pair.getLeft()))
-                                    .map(Pair::getRight)
+                                    .filter(pair -> accusationIds.contains(pair.getFirst()))
+                                    .map(Pair::getSecond)
                                     .reduce(0, Integer::sum);
 
                             return InquisitionProcessConverter.convertToPayload(value.get(0), caseCount);
@@ -200,16 +203,20 @@ public class InquisitionService {
         return new PayloadWithCollection<>(200, "", payload);
     }
 
-    public Payload getAllCases(Integer accusationId) {
-        AccusationProcess process = accusationProcessRepository.find(accusationId);
+    public Payload getAllCases(Integer processId) {
+        AccusationProcess process = accusationProcessRepository.findByInquisitionProcess(processId);
         if (process == null) {
-            return new BasePayload(400, "Не найден процесс сбора доносов с id " + accusationId);
+            return new BasePayload(400, "Не найден процесс сбора доносов с id " + processId);
         }
         QueryFetchHelper<Integer, List<AccusationRecordFullWithCaseId>> helper = new QueryFetchHelper<>(
-                accusationId,
+                process.getId(),
                 accusationRecordRepository::getNotResolvedAccusationRecordWithCases
         );
-        List<AccusationRecordFullWithCaseId> records = helper.fetch();
+        Pair<List<AccusationRecordFullWithCaseId>, String> pair = helper.fetch();
+        List<AccusationRecordFullWithCaseId> records = pair.getFirst();
+        if (records == null) {
+            return new BasePayload(400, pair.getSecond());
+        }
         Map<Integer, List<AccusationRecordFullWithCaseId>> recordsByCaseId =
                 records.stream().collect(Collectors.groupingBy(AccusationRecordFullWithCaseId::getCaseId));
         Map<Integer, AccusationRecordWithCasePayload> payloadMap = recordsByCaseId.entrySet().stream()
@@ -247,7 +254,7 @@ public class InquisitionService {
                 inquisitionProcessRepository::finishInquisitionProcess
         );
 
-        Integer processId = helper.fetch();
+        Integer processId = helper.fetch().getFirst();
         if (processId == null) {
             return new BasePayload(400, INCORRECT_REQUEST);
         }

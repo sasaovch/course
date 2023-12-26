@@ -7,6 +7,7 @@ import com.inquisition.inquisition.model.user.UserRole;
 import com.inquisition.inquisition.security.UserDetailsImpl;
 
 public final class UserConverter {
+    private UserConverter() {}
 
     public static LoginedUser convertToUserDTO(UserDetailsImpl userDetails, String jwt) {
         UserRole userRole = UserRole.valueOf(userDetails.getAuthority().getAuthority());

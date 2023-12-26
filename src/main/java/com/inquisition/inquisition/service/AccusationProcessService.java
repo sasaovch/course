@@ -3,6 +3,7 @@ package com.inquisition.inquisition.service;
 import java.util.List;
 import java.util.function.Function;
 
+import com.inquisition.inquisition.Pair;
 import com.inquisition.inquisition.model.accusation.AccusationProcess;
 import com.inquisition.inquisition.model.accusation.AccusationProcessWithIdContainer;
 import com.inquisition.inquisition.model.accusation.AccusationProcessWithInqProcessId;
@@ -113,7 +114,8 @@ public class AccusationProcessService {
                 accusationId,
                 sqlRequest
         );
-        List<AccusationRecordFull> records = helper.fetch();
+        Pair<List<AccusationRecordFull>, String> pair = helper.fetch();
+        List<AccusationRecordFull> records = pair.getFirst();
         if (records == null) {
             return new BasePayload(400, ERROR_WHILE_HANDLE_REQUEST);
         }

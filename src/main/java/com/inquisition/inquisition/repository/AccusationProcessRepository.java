@@ -30,6 +30,15 @@ public class AccusationProcessRepository {
                 .orElse(null);
     }
 
+    @Transactional(readOnly = true)
+    public AccusationProcess findByInquisitionProcess(Integer inqPr) {
+        return dsl.selectFrom(ACCUSATION_PROCESS_TABLE)
+                .where(ACCUSATION_PROCESS_TABLE.INQUISITION_PROCESS_ID.eq(inqPr))
+                .fetchOptional()
+                .map(r -> r.into(AccusationProcess.class))
+                .orElse(null);
+    }
+
     @Transactional
     public Integer startAccusationProcess(Integer inquisitionProcessId) {
         StartAccusationProcess startAccusationProcess = new StartAccusationProcess();

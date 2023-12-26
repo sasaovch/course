@@ -3,6 +3,7 @@ package com.inquisition.inquisition.repository;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.inquisition.inquisition.Pair;
 import com.inquisition.inquisition.mapper.accusation.AccusationRecordComplexMapper;
 import com.inquisition.inquisition.mapper.accusation.AccusationRecordMapper;
 import com.inquisition.inquisition.model.accusation.AccusationRecord;
@@ -11,7 +12,6 @@ import com.inquisition.inquisition.model.accusation.AccusationRecordFullWithCase
 import com.inquisition.inquisition.models.routines.AddAccusationRecord;
 import com.inquisition.inquisition.models.routines.ConnectCommandmentWithRecord;
 import com.inquisition.inquisition.models.tables.GetNotResolvedAccusationRecord;
-import com.nimbusds.jose.util.Pair;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;

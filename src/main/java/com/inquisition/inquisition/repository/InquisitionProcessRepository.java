@@ -76,6 +76,14 @@ public class InquisitionProcessRepository {
     }
 
     @Transactional(readOnly = true)
+    public boolean existProcess(Integer processId) {
+        return dsl.selectFrom(INQUISITION_PROCESS_TABLE)
+                .where(INQUISITION_PROCESS_TABLE.ID.eq(processId))
+                .fetchOptional()
+                .isPresent();
+    }
+
+    @Transactional(readOnly = true)
     public List<InquisitionCaseLog> getCasesForDiscussion(Integer inquisitionId) {
         return getCaseForCondition(DSL.condition(ACCUSATION_PROCESS_TABLE.INQUISITION_PROCESS_ID.eq(inquisitionId))
                 .and(CASE_LOG_TABLE.CASE_STATUS.eq(CaseLogStatus.Conversation))
