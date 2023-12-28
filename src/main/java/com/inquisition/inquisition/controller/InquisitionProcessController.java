@@ -59,7 +59,7 @@ public class InquisitionProcessController {
     }
 
     @GetMapping("/getCurrentForPerson")
-    @PreAuthorize("hasAnyAuthority('BISHOP', 'INQUISITOR', 'USER', 'SECULAR_AUTHORITY')")
+    @PreAuthorize("hasAnyAuthority('BISHOP', 'INQUISITOR', 'USER', 'SECULAR_AUTHORITY', 'FISCAL')")
     public ResponseEntity<Payload> getCurrentProcessForBishop() {
         Payload payload = inquisitionProcessService.getCurrentInquisitionProcessForBishop();
         if (payload.code() != 200) {

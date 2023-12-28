@@ -10,7 +10,7 @@
 //public class ChatWebSocketController {
 //    @Autowired
 //    private SimpMessagingTemplate messagingTemplate;
-//    @Autowired private ChatMessageService chatMessageService;
+//    @Autowired pri vate ChatMessageService chatMessageService;
 //    @Autowired private ChatRoomService chatRoomService;
 //
 //    @MessageMapping("/chat")

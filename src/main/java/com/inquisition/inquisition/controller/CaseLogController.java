@@ -52,6 +52,7 @@ public class CaseLogController {
     }
 
     @PostMapping("/finishTorture")
+    @PreAuthorize("hasAnyAuthority('FISCAL')")
     public ResponseEntity<Payload> finishTorture(@RequestBody CaseWithResultContainer input) {
         return ResponseEntity.ok(caseLogService.finishTorture(input));
     }
@@ -63,7 +64,7 @@ public class CaseLogController {
     }
 
     @GetMapping("/forTorture/{inquisition_id}")
-    @PreAuthorize("hasAnyAuthority('INQUISITOR', 'SECULAR_AUTHORITY')")
+    @PreAuthorize("hasAnyAuthority('INQUISITOR', 'FISCAL')")
     public ResponseEntity<Payload> getCasesForTorture(@PathVariable("inquisition_id") Integer inquisitionId) {
         return ResponseEntity.ok(caseLogService.getCasesForTorture(inquisitionId));
     }

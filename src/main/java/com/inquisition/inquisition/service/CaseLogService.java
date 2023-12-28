@@ -104,12 +104,12 @@ public class CaseLogService {
             return new BasePayload(400, ERROR_WHILE_HANDLE_REQUEST);
         }
 
-        Map<Integer, Person> punishmentByCaseId = caseLogs.stream().collect(Collectors.toMap(
-                caseLog -> caseLog.getCaseLog().getCaseId(), c -> personRepository.find(c.getCaseLog().getPunishmentId())
+        Map<Integer, Person> punishmentByCaseId = caseLogs.stream().map(InquisitionCaseLog::getCaseLog).collect(Collectors.toSet()).stream().collect(Collectors.toMap(
+                CaseLog::getCaseId, c -> personRepository.find(c.getPunishmentId())
         ));
 
-        Map<Integer, Prison> prisonMap = caseLogs.stream().collect(Collectors.toMap(
-                caseLog -> caseLog.getCaseLog().getCaseId(), c -> prisonRepository.find(c.getCaseLog().getPrisonId())
+        Map<Integer, Prison> prisonMap = caseLogs.stream().map(InquisitionCaseLog::getCaseLog).collect(Collectors.toSet()).stream().collect(Collectors.toMap(
+                CaseLog::getCaseId, c -> prisonRepository.find(c.getPrisonId())
         ));
 
         Map<Integer, AccusationRecordComplex> recordById = recordComplexes.stream()
@@ -117,7 +117,7 @@ public class CaseLogService {
         List<CaseLogForPunishmentPayload> payload = caseLogs.stream()
                 .map(c -> {
                             AccusationRecordComplex record = recordById.get(c.getAccusationRecord().getId());
-                            Person person = punishmentByCaseId.get(c.getCaseLog().getCaseId());
+                             Person person = punishmentByCaseId.get(c.getCaseLog().getCaseId());
                             Prison prison = prisonMap.get(c.getCaseLog().getCaseId());
                             return convertToPunishmentPayload(record, person, prison, c.getCaseLog());
                         }
