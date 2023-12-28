@@ -1,7 +1,7 @@
 package com.inquisition.inquisition.utils;
 
-public final class Constants {
-    private Constants() {
+public final class Aliases {
+    private Aliases() {
     }
 
     public static final String PERSON_ALIAS = "person";
@@ -22,5 +22,6 @@ public final class Constants {
     public static final String BIBLE_COMMANDMENT_ALIAS = "bible_commandment";
     public static final String USER_ALIAS = "users";
     public static final String VIOLATION_ALIAS = "violation";
+    public static final String PRISON_ALIAS = "prison";
 
 }

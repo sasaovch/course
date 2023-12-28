@@ -6,6 +6,7 @@ import lombok.Data;
 
 @Data
 public class CaseLogForProcessPayload {
+    private Integer id;
     private String informer;
     private String bishop;
     private String accused;
