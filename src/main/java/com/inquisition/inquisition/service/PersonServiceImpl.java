@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.inquisition.inquisition.model.payload.Payload;
 import com.inquisition.inquisition.model.payload.PayloadWithCollection;
-import com.inquisition.inquisition.model.person.Person;
+import com.inquisition.inquisition.model.person.entity.Person;
 import com.inquisition.inquisition.repository.PersonRepository;
 import org.springframework.stereotype.Service;
 

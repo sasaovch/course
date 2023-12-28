@@ -1,7 +1,7 @@
 package com.inquisition.inquisition.mapper.user;
 
-import com.inquisition.inquisition.model.user.User;
-import com.inquisition.inquisition.model.user.UserRole;
+import com.inquisition.inquisition.model.user.entity.User;
+import com.inquisition.inquisition.model.user.entity.UserRole;
 import com.inquisition.inquisition.models.enums.UserRoles;
 import com.inquisition.inquisition.models.tables.Users;
 import com.inquisition.inquisition.models.tables.records.UsersRecord;

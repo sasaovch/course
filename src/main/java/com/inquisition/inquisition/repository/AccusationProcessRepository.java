@@ -1,6 +1,6 @@
 package com.inquisition.inquisition.repository;
 
-import com.inquisition.inquisition.model.accusation.AccusationProcess;
+import com.inquisition.inquisition.model.accusation.entity.AccusationProcess;
 import com.inquisition.inquisition.models.routines.FinishAccusationProcess;
 import com.inquisition.inquisition.models.routines.GenerateCases;
 import com.inquisition.inquisition.models.routines.HandleCasesWithGraveSin;
@@ -31,9 +31,9 @@ public class AccusationProcessRepository {
     }
 
     @Transactional(readOnly = true)
-    public AccusationProcess findByInquisitionProcess(Integer inqPr) {
+    public AccusationProcess findByInquisitionProcess(Integer inquisitionProcessId) {
         return dsl.selectFrom(ACCUSATION_PROCESS_TABLE)
-                .where(ACCUSATION_PROCESS_TABLE.INQUISITION_PROCESS_ID.eq(inqPr))
+                .where(ACCUSATION_PROCESS_TABLE.INQUISITION_PROCESS_ID.eq(inquisitionProcessId))
                 .fetchOptional()
                 .map(r -> r.into(AccusationProcess.class))
                 .orElse(null);
@@ -48,10 +48,11 @@ public class AccusationProcessRepository {
     }
 
     @Transactional
-    public void finishAccusationProcess(Integer accusationProcessId) {
+    public Void finishAccusationProcess(Integer accusationProcessId) {
         FinishAccusationProcess finishAccusationProcess = new FinishAccusationProcess();
         finishAccusationProcess.setCurAccusationId(accusationProcessId);
         finishAccusationProcess.execute(dsl.configuration());
+        return null;
     }
 
     @Transactional

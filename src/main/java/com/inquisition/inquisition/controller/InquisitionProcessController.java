@@ -1,9 +1,9 @@
 package com.inquisition.inquisition.controller;
 
-import com.inquisition.inquisition.model.inquisition.InquisitionProcessIdContainer;
-import com.inquisition.inquisition.model.inquisition.InquisitionProcessStartContainer;
+import com.inquisition.inquisition.model.inquisition.container.InquisitionProcessIdContainer;
+import com.inquisition.inquisition.model.inquisition.container.InquisitionProcessStartContainer;
 import com.inquisition.inquisition.model.payload.Payload;
-import com.inquisition.inquisition.service.InquisitionService;
+import com.inquisition.inquisition.service.InquisitionProcessService;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,15 +24,15 @@ import org.springframework.web.bind.annotation.RestController;
 )
 @PreAuthorize("hasAnyAuthority('INQUISITOR')")
 public class InquisitionProcessController {
-    private final InquisitionService inquisitionService;
+    private final InquisitionProcessService inquisitionProcessService;
 
-    public InquisitionProcessController(InquisitionService inquisitionService) {
-        this.inquisitionService = inquisitionService;
+    public InquisitionProcessController(InquisitionProcessService inquisitionProcessService) {
+        this.inquisitionProcessService = inquisitionProcessService;
     }
 
     @PostMapping("/start")
     public ResponseEntity<Payload> startProcess(@Valid @RequestBody InquisitionProcessStartContainer container) {
-        Payload payload = inquisitionService.startProcess(container);
+        Payload payload = inquisitionProcessService.startProcess(container);
         if (payload.code() != 200) {
             return ResponseEntity.badRequest().body(payload);
         }
@@ -41,7 +41,7 @@ public class InquisitionProcessController {
 
     @PostMapping("/finish")
     public ResponseEntity<Payload> finishProcess(@Valid @RequestBody InquisitionProcessIdContainer container) {
-        Payload payload = inquisitionService.finishProcess(container);
+        Payload payload = inquisitionProcessService.finishProcess(container);
         if (payload.code() != 200) {
             return ResponseEntity.badRequest().body(payload);
         }
@@ -51,7 +51,7 @@ public class InquisitionProcessController {
     @GetMapping("/getCurrent/{official_id}")
     @PreAuthorize("hasAnyAuthority('INQUISITOR')")
     public ResponseEntity<Payload> getCurrentProcess(@PathVariable("official_id") Integer officialId) {
-        Payload payload = inquisitionService.getCurrentInquisitionProcessForInquisitor(officialId);
+        Payload payload = inquisitionProcessService.getCurrentInquisitionProcessForInquisitor(officialId);
         if (payload.code() != 200) {
             return ResponseEntity.badRequest().body(payload);
         }
@@ -61,7 +61,7 @@ public class InquisitionProcessController {
     @GetMapping("/getCurrentForPerson")
     @PreAuthorize("hasAnyAuthority('BISHOP', 'INQUISITOR', 'USER', 'SECULAR_AUTHORITY')")
     public ResponseEntity<Payload> getCurrentProcessForBishop() {
-        Payload payload = inquisitionService.getCurrentInquisitionProcessForBishop();
+        Payload payload = inquisitionProcessService.getCurrentInquisitionProcessForBishop();
         if (payload.code() != 200) {
             return ResponseEntity.badRequest().body(payload);
         }
@@ -70,7 +70,7 @@ public class InquisitionProcessController {
 
     @GetMapping("/getAllInquisitions")
     public ResponseEntity<Payload> getAllInquisitions() {
-        Payload payload = inquisitionService.getAllInquisitionProcess();
+        Payload payload = inquisitionProcessService.getAllInquisitionProcess();
         if (payload.code() != 200) {
             return ResponseEntity.badRequest().body(payload);
         }
@@ -78,8 +78,9 @@ public class InquisitionProcessController {
     }
 
     @GetMapping("/allCases/{process_id}")
+    @PreAuthorize("hasAnyAuthority('BISHOP', 'INQUISITOR')")
     public ResponseEntity<Payload> getAllCases(@PathVariable("process_id") Integer processId) {
-        Payload payload = inquisitionService.getAllCases(processId);
+        Payload payload = inquisitionProcessService.getAllCases(processId);
         if (payload.code() != 200) {
             return ResponseEntity.badRequest().body(payload);
         }

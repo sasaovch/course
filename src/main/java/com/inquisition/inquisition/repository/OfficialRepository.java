@@ -1,7 +1,7 @@
 package com.inquisition.inquisition.repository;
 
 import com.inquisition.inquisition.mapper.official.OfficialRecordMapper;
-import com.inquisition.inquisition.model.official.Official;
+import com.inquisition.inquisition.model.official.entity.Official;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -24,6 +24,7 @@ public class OfficialRepository {
     public Official getCurrentByPersonId(Integer personId) {
         return dsl.selectFrom(OFFICIAL_TABLE)
                 .where(OFFICIAL_TABLE.PERSON_ID.eq(personId))
+                .and(OFFICIAL_TABLE.FIRED_DATE.isNull())
                 .fetchOptional()
                 .map(officialRecordMapper::mapOfficial)
                 .orElse(null);

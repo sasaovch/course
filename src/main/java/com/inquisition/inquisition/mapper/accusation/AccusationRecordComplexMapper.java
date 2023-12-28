@@ -3,9 +3,9 @@ package com.inquisition.inquisition.mapper.accusation;
 import java.time.LocalDate;
 
 import com.inquisition.inquisition.mapper.person.PersonRecordMapper;
-import com.inquisition.inquisition.model.accusation.AccusationRecordFull;
-import com.inquisition.inquisition.model.accusation.AccusationRecordFullWithCaseId;
-import com.inquisition.inquisition.model.person.Person;
+import com.inquisition.inquisition.model.accusation.entity.AccusationRecordComplex;
+import com.inquisition.inquisition.model.accusation.entity.AccusationRecordComplexWithCaseId;
+import com.inquisition.inquisition.model.person.entity.Person;
 import org.jooq.Record;
 import org.springframework.stereotype.Component;
 
@@ -23,12 +23,12 @@ public class AccusationRecordComplexMapper {
         this.personRecordMapper = personRecordMapper;
     }
 
-    public AccusationRecordFull mapAccusationRecordComplex(Record record) {
+    public AccusationRecordComplex mapAccusationRecordComplex(Record record) {
         Integer id = record.get(ACCUSATION_RECORD_TABLE.ID);
         String violationPlace = record.get(ACCUSATION_RECORD_TABLE.VIOLATION_PLACE);
         LocalDate violationTime = record.get(ACCUSATION_RECORD_TABLE.VIOLATION_TIME);
         String description = record.get(ACCUSATION_RECORD_TABLE.DESCRIPTION);
-        AccusationRecordFull recordFull = new AccusationRecordFull();
+        AccusationRecordComplex recordFull = new AccusationRecordComplex();
 
         Person informer = personRecordMapper.mapPerson(record, INFORMER_TABLE);
         Person bishop = personRecordMapper.mapPerson(record, BISHOP_TABLE);
@@ -46,10 +46,10 @@ public class AccusationRecordComplexMapper {
     }
 
 
-    public AccusationRecordFullWithCaseId mapAccusationRecordComplexWithCase(Record record) {
-        AccusationRecordFull recordFull = mapAccusationRecordComplex(record);
+    public AccusationRecordComplexWithCaseId mapAccusationRecordComplexWithCase(Record record) {
+        AccusationRecordComplex recordFull = mapAccusationRecordComplex(record);
 
-        AccusationRecordFullWithCaseId result = new AccusationRecordFullWithCaseId();
+        AccusationRecordComplexWithCaseId result = new AccusationRecordComplexWithCaseId();
 
         Integer caseId = record.get(INVESTIGATIVE_CASE_TABLE.ID);
         LocalDate creationDate = record.get(INVESTIGATIVE_CASE_TABLE.CREATION_DATE);
@@ -59,6 +59,7 @@ public class AccusationRecordComplexMapper {
         result.setBishop(recordFull.getBishop());
         result.setAccused(recordFull.getAccused());
         result.setViolationPlace(recordFull.getViolationPlace());
+        result.setViolationTime(recordFull.getViolationTime());
         result.setDescription(recordFull.getDescription());
 
         result.setCaseId(caseId);

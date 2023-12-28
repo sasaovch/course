@@ -3,7 +3,7 @@ package com.inquisition.inquisition.repository;
 import java.util.List;
 
 import com.inquisition.inquisition.mapper.locality.LocalityRecordMapper;
-import com.inquisition.inquisition.model.locality.Locality;
+import com.inquisition.inquisition.model.locality.entity.Locality;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;

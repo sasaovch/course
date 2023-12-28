@@ -1,7 +1,7 @@
 package com.inquisition.inquisition.mapper.person;
 
-import com.inquisition.inquisition.model.person.Gender;
-import com.inquisition.inquisition.model.person.Person;
+import com.inquisition.inquisition.model.person.entity.Gender;
+import com.inquisition.inquisition.model.person.entity.Person;
 import org.jooq.Record;
 import org.springframework.stereotype.Component;
 

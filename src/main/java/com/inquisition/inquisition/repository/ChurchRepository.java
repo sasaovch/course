@@ -1,7 +1,7 @@
 package com.inquisition.inquisition.repository;
 
 import com.inquisition.inquisition.mapper.church.ChurchRecordMapper;
-import com.inquisition.inquisition.model.church.Church;
+import com.inquisition.inquisition.model.church.entity.Church;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -11,10 +11,13 @@ import static com.inquisition.inquisition.utils.TableAliases.CHURCH_TABLE;
 
 @Repository
 public class ChurchRepository {
-    @Autowired
-    private DSLContext dsl;
-    @Autowired
-    private ChurchRecordMapper churchRecordMapper;
+    private final DSLContext dsl;
+    private final ChurchRecordMapper churchRecordMapper;
+
+    public ChurchRepository(DSLContext dsl, ChurchRecordMapper churchRecordMapper) {
+        this.dsl = dsl;
+        this.churchRecordMapper = churchRecordMapper;
+    }
 
     @Transactional(readOnly = true)
     public Church findByLocality(Integer localityId) {

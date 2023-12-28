@@ -1,18 +1,18 @@
 package com.inquisition.inquisition.service;
 
 import com.inquisition.inquisition.jwt.JwtUtils;
-import com.inquisition.inquisition.model.locality.Locality;
-import com.inquisition.inquisition.model.official.Official;
+import com.inquisition.inquisition.model.locality.entity.Locality;
+import com.inquisition.inquisition.model.official.entity.Official;
 import com.inquisition.inquisition.model.payload.BasePayload;
 import com.inquisition.inquisition.model.payload.Payload;
 import com.inquisition.inquisition.model.payload.PayloadWithUser;
-import com.inquisition.inquisition.model.person.Person;
-import com.inquisition.inquisition.model.user.LoginUser;
-import com.inquisition.inquisition.model.user.LoginedUser;
-import com.inquisition.inquisition.model.user.SignupUser;
-import com.inquisition.inquisition.model.user.User;
-import com.inquisition.inquisition.model.user.UserDTO;
-import com.inquisition.inquisition.model.user.UserRole;
+import com.inquisition.inquisition.model.person.entity.Person;
+import com.inquisition.inquisition.model.user.container.LoginUser;
+import com.inquisition.inquisition.model.user.entity.LoginedUser;
+import com.inquisition.inquisition.model.user.container.SignupUser;
+import com.inquisition.inquisition.model.user.entity.User;
+import com.inquisition.inquisition.model.user.payload.UserPayload;
+import com.inquisition.inquisition.model.user.entity.UserRole;
 import com.inquisition.inquisition.repository.LocalityRepository;
 import com.inquisition.inquisition.repository.OfficialRepository;
 import com.inquisition.inquisition.repository.PersonRepository;
@@ -74,7 +74,7 @@ public class AuthenticationService {
             officialId = official.getId();
         }
 
-        UserDTO userDTO = new UserDTO(
+        UserPayload userPayload = new UserPayload(
                 loginedUser.username(),
                 role,
                 loginedUser.jwtToken(),
@@ -84,7 +84,7 @@ public class AuthenticationService {
                 person.getLocalityId()
         );
 
-        return new PayloadWithUser(200, userDTO);
+        return new PayloadWithUser(200, userPayload);
     }
 
     public Payload registerUser(SignupUser signupUser) {
@@ -128,7 +128,7 @@ public class AuthenticationService {
 
         userRepository.insert(user);
         LoginedUser loginedUser = login(user.getUsername(), signupUser.getPassword());
-        UserDTO userDTO = new UserDTO(
+        UserPayload userPayload = new UserPayload(
                 loginedUser.username(),
                 role,
                 loginedUser.jwtToken(),
@@ -138,7 +138,7 @@ public class AuthenticationService {
                 person.getLocalityId()
         );
 
-        return new PayloadWithUser(200, userDTO);
+        return new PayloadWithUser(200, userPayload);
     }
 
     private LoginedUser login(String username, String password) {

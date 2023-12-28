@@ -1,9 +1,9 @@
 package com.inquisition.inquisition.controller;
 
-import com.inquisition.inquisition.model.accusation.AccusationProcessWithIdContainer;
-import com.inquisition.inquisition.model.accusation.AccusationProcessWithInqProcessId;
-import com.inquisition.inquisition.model.accusation.AddAccusationRecordContainer;
-import com.inquisition.inquisition.model.accusation.ConnectCommandmentContainer;
+import com.inquisition.inquisition.model.accusation.container.AccusationProcessWithIdContainer;
+import com.inquisition.inquisition.model.accusation.container.AccusationProcessWithInqProcessId;
+import com.inquisition.inquisition.model.accusation.container.AddAccusationRecordContainer;
+import com.inquisition.inquisition.model.commandment.container.ConnectCommandmentContainer;
 import com.inquisition.inquisition.model.payload.Payload;
 import com.inquisition.inquisition.service.AccusationProcessService;
 import jakarta.validation.Valid;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
         value = "/accusations",
         produces = MediaType.APPLICATION_JSON_VALUE
 )
-@PreAuthorize("hasAnyAuthority('INQUISITOR')")
+@PreAuthorize("hasAnyAuthority('INQUISITOR', 'BISHOP')")
 public class AccusationProcessController {
     private final AccusationProcessService accusationProcessService;
 
@@ -33,6 +33,7 @@ public class AccusationProcessController {
     }
 
     @PostMapping("/start")
+    @PreAuthorize("hasAnyAuthority('INQUISITOR')")
     public ResponseEntity<Payload> startProcess(
             @Valid @RequestBody AccusationProcessWithInqProcessId container
     ) {
@@ -44,6 +45,7 @@ public class AccusationProcessController {
     }
 
     @PostMapping("/finish")
+    @PreAuthorize("hasAnyAuthority('INQUISITOR')")
     public ResponseEntity<Payload> finishProcess(
             @Valid @RequestBody AccusationProcessWithIdContainer container
     ) {
@@ -66,7 +68,6 @@ public class AccusationProcessController {
     }
 
     @GetMapping("/accusationRecords/{process_id}")
-    @PreAuthorize("hasAnyAuthority('INQUISITOR')")
     public ResponseEntity<Payload> getAccusationRecords(@PathVariable("process_id") Integer processId) {
         Payload payload = accusationProcessService.getAllAccusationRecords(processId);
         if (payload.code() != 200) {
@@ -85,7 +86,6 @@ public class AccusationProcessController {
     }
 
     @PostMapping("/add")
-    @PreAuthorize("hasAnyAuthority('INQUISITOR', 'BISHOP')")
     public ResponseEntity<Payload> add(@Valid @RequestBody AddAccusationRecordContainer container) {
         Payload payload = accusationProcessService.addRecord(container);
         if (payload.code() != 200) {

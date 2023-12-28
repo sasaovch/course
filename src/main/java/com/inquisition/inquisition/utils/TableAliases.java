@@ -14,6 +14,7 @@ import com.inquisition.inquisition.models.tables.Locality;
 import com.inquisition.inquisition.models.tables.Official;
 import com.inquisition.inquisition.models.tables.Person;
 import com.inquisition.inquisition.models.tables.Users;
+import com.inquisition.inquisition.models.tables.Violation;
 
 import static com.inquisition.inquisition.utils.Constants.ACCUSATION_INVESTIGATIVE_CASE_ALIAS;
 import static com.inquisition.inquisition.utils.Constants.ACCUSATION_PROCESS_ALIAS;
@@ -32,6 +33,7 @@ import static com.inquisition.inquisition.utils.Constants.LOCALITY_ALIAS;
 import static com.inquisition.inquisition.utils.Constants.OFFICIAL_ALIAS;
 import static com.inquisition.inquisition.utils.Constants.PERSON_ALIAS;
 import static com.inquisition.inquisition.utils.Constants.USER_ALIAS;
+import static com.inquisition.inquisition.utils.Constants.VIOLATION_ALIAS;
 
 public final class TableAliases {
     private TableAliases() {
@@ -60,4 +62,5 @@ public final class TableAliases {
     public static final BibleCommandment BIBLE_COMMANDMENT_TABLE =
             BibleCommandment.BIBLE_COMMANDMENT.as(BIBLE_COMMANDMENT_ALIAS);
     public static final Users USER_TABLE = Users.USERS.as(USER_ALIAS);
+    public static final Violation VIOLATION_TABLE = Violation.VIOLATION.as(VIOLATION_ALIAS);
 }

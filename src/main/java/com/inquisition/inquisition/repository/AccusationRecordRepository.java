@@ -6,9 +6,9 @@ import java.util.List;
 import com.inquisition.inquisition.Pair;
 import com.inquisition.inquisition.mapper.accusation.AccusationRecordComplexMapper;
 import com.inquisition.inquisition.mapper.accusation.AccusationRecordMapper;
-import com.inquisition.inquisition.model.accusation.AccusationRecord;
-import com.inquisition.inquisition.model.accusation.AccusationRecordFull;
-import com.inquisition.inquisition.model.accusation.AccusationRecordFullWithCaseId;
+import com.inquisition.inquisition.model.accusation.entity.AccusationRecord;
+import com.inquisition.inquisition.model.accusation.entity.AccusationRecordComplex;
+import com.inquisition.inquisition.model.accusation.entity.AccusationRecordComplexWithCaseId;
 import com.inquisition.inquisition.models.routines.AddAccusationRecord;
 import com.inquisition.inquisition.models.routines.ConnectCommandmentWithRecord;
 import com.inquisition.inquisition.models.tables.GetNotResolvedAccusationRecord;
@@ -54,39 +54,44 @@ public class AccusationRecordRepository {
     }
 
     @Transactional(readOnly = true)
-    public List<AccusationRecordFull> getNotResolvedAccusationRecordWithSubFields(Integer processId) {
+    public List<AccusationRecordComplex> getNotResolvedAccusationRecordComplex(Integer processId) {
         GetNotResolvedAccusationRecord function = new GetNotResolvedAccusationRecord().call(processId);
         return findByCondition(DSL.condition(ACCUSATION_RECORD_TABLE.ID.in(DSL.select(function.GET_NOT_RESOLVED_ACCUSATION_RECORD_).from(function))));
     }
 
-    @Transactional(readOnly = true)
-    public List<AccusationRecordFullWithCaseId> getNotResolvedAccusationRecordWithCases(Integer processId) {
-        GetNotResolvedAccusationRecord function = new GetNotResolvedAccusationRecord().call(processId);
+//    @Transactional(readOnly = true)
+//    public List<AccusationRecordComplexWithCaseId> getNotResolvedAccusationRecordWithCases(Integer processId) {
+//        GetNotResolvedAccusationRecord function = new GetNotResolvedAccusationRecord().call(processId);
+//
+//        return dsl.select()
+//                .from(ACCUSATION_RECORD_TABLE)
+//                .join(BISHOP_TABLE)
+//                .on(BISHOP_TABLE.ID.eq(ACCUSATION_RECORD_TABLE.BISHOP))
+//                .join(INFORMER_TABLE)
+//                .on(INFORMER_TABLE.ID.eq(ACCUSATION_RECORD_TABLE.INFORMER))
+//                .join(ACCUSED_TABLE)
+//                .on(ACCUSED_TABLE.ID.eq(ACCUSATION_RECORD_TABLE.ACCUSED))
+//                .join(ACCUSATION_INVESTIGATIVE_CASE_TABLE)
+//                .on(ACCUSATION_INVESTIGATIVE_CASE_TABLE.RECORD_ID.eq(ACCUSATION_RECORD_TABLE.ID))
+//                .join(INVESTIGATIVE_CASE_TABLE)
+//                .on(INVESTIGATIVE_CASE_TABLE.ID.eq(ACCUSATION_INVESTIGATIVE_CASE_TABLE.CASE_ID))
+//                .where(DSL.condition(ACCUSATION_RECORD_TABLE.ID.in(DSL.select(function.GET_NOT_RESOLVED_ACCUSATION_RECORD_).from(function))))
+//                .fetch()
+//                .map(accusationRecordComplexMapper::mapAccusationRecordComplexWithCase);
+//    }
 
-        return dsl.select()
-                .from(ACCUSATION_RECORD_TABLE)
-                .join(BISHOP_TABLE)
-                .on(BISHOP_TABLE.ID.eq(ACCUSATION_RECORD_TABLE.BISHOP))
-                .join(INFORMER_TABLE)
-                .on(INFORMER_TABLE.ID.eq(ACCUSATION_RECORD_TABLE.INFORMER))
-                .join(ACCUSED_TABLE)
-                .on(ACCUSED_TABLE.ID.eq(ACCUSATION_RECORD_TABLE.ACCUSED))
-                .join(ACCUSATION_INVESTIGATIVE_CASE_TABLE)
-                .on(ACCUSATION_INVESTIGATIVE_CASE_TABLE.RECORD_ID.eq(ACCUSATION_RECORD_TABLE.ID))
-                .join(INVESTIGATIVE_CASE_TABLE)
-                .on(INVESTIGATIVE_CASE_TABLE.ID.eq(ACCUSATION_INVESTIGATIVE_CASE_TABLE.CASE_ID))
-                .where(DSL.condition(ACCUSATION_RECORD_TABLE.ID.in(DSL.select(function.GET_NOT_RESOLVED_ACCUSATION_RECORD_).from(function))))
-                .fetch()
-                .map(accusationRecordComplexMapper::mapAccusationRecordComplexWithCase);
-    }
-
     @Transactional(readOnly = true)
-    public List<AccusationRecordFull> findByProcessId(Integer processId) {
+    public List<AccusationRecordComplex> findByProcessId(Integer processId) {
         return findByCondition(DSL.condition(ACCUSATION_RECORD_TABLE.ID_ACCUSATION.eq(processId)));
     }
 
     @Transactional(readOnly = true)
-    public List<AccusationRecordFull> findByCondition(Condition condition) {
+    public List<AccusationRecordComplex> findById(List<Integer> ids) {
+        return findByCondition(DSL.condition(ACCUSATION_RECORD_TABLE.ID.in(ids)));
+    }
+
+    @Transactional(readOnly = true)
+    public List<AccusationRecordComplex> findByCondition(Condition condition) {
         return dsl.select()
                 .from(ACCUSATION_RECORD_TABLE)
                 .join(BISHOP_TABLE)

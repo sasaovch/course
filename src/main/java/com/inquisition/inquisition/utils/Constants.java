@@ -21,5 +21,6 @@ public final class Constants {
     public static final String COMMANDMENT_ALIAS = "commandment";
     public static final String BIBLE_COMMANDMENT_ALIAS = "bible_commandment";
     public static final String USER_ALIAS = "users";
+    public static final String VIOLATION_ALIAS = "violation";
 
 }

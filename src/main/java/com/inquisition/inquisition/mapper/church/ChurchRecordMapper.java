@@ -1,7 +1,7 @@
 package com.inquisition.inquisition.mapper.church;
 
-import com.inquisition.inquisition.model.church.Church;
-import com.inquisition.inquisition.model.locality.Locality;
+import com.inquisition.inquisition.model.church.entity.Church;
+import com.inquisition.inquisition.model.locality.entity.Locality;
 import org.jooq.Record;
 import org.springframework.stereotype.Component;
 

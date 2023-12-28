@@ -4,8 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.inquisition.inquisition.mapper.person.PersonRecordMapper;
-import com.inquisition.inquisition.model.person.Gender;
-import com.inquisition.inquisition.model.person.Person;
+import com.inquisition.inquisition.model.person.entity.Gender;
+import com.inquisition.inquisition.model.person.entity.Person;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;

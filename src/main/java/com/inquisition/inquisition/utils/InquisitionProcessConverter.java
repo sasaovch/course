@@ -1,9 +1,9 @@
 package com.inquisition.inquisition.utils;
 
-import com.inquisition.inquisition.model.inquisition.CurrentInquisitionProcessPayload;
-import com.inquisition.inquisition.model.inquisition.InquisitionProcess;
-import com.inquisition.inquisition.model.inquisition.InquisitionProcessPayload;
-import com.inquisition.inquisition.model.person.Person;
+import com.inquisition.inquisition.model.inquisition.payload.CurrentInquisitionProcessPayload;
+import com.inquisition.inquisition.model.inquisition.entity.InquisitionProcess;
+import com.inquisition.inquisition.model.inquisition.payload.InquisitionProcessPayload;
+import com.inquisition.inquisition.model.person.entity.Person;
 
 public final class InquisitionProcessConverter {
     private InquisitionProcessConverter() {}

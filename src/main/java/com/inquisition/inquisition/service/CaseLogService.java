@@ -1,19 +1,26 @@
 package com.inquisition.inquisition.service;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
-import com.inquisition.inquisition.model.cases.CaseInput;
-import com.inquisition.inquisition.model.cases.CaseWithResultInput;
-import com.inquisition.inquisition.model.cases.CaseWithStepInput;
-import com.inquisition.inquisition.model.cases.InquisitionCaseLog;
+import com.inquisition.inquisition.model.accusation.entity.AccusationRecordComplex;
+import com.inquisition.inquisition.model.cases.container.CaseIdContainer;
+import com.inquisition.inquisition.model.cases.container.CaseWithResultContainer;
+import com.inquisition.inquisition.model.cases.container.CaseWithStepContainer;
+import com.inquisition.inquisition.model.cases.entity.CaseLog;
+import com.inquisition.inquisition.model.cases.entity.InquisitionCaseLog;
+import com.inquisition.inquisition.model.cases.payload.CaseLogForProcessPayload;
 import com.inquisition.inquisition.model.payload.BasePayload;
 import com.inquisition.inquisition.model.payload.Payload;
 import com.inquisition.inquisition.model.payload.PayloadWithCollection;
-import com.inquisition.inquisition.models.enums.CaseLogStatus;
+import com.inquisition.inquisition.repository.AccusationRecordRepository;
 import com.inquisition.inquisition.repository.CaseLogRepository;
 import com.inquisition.inquisition.repository.InquisitionProcessRepository;
-import com.inquisition.inquisition.repository.QueryFetchHelper;
+import com.inquisition.inquisition.repository.helper.QueryFetchHelper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.inquisition.inquisition.utils.Messages.ERROR_WHILE_HANDLE_REQUEST;
@@ -22,6 +29,8 @@ import static com.inquisition.inquisition.utils.Messages.ERROR_WHILE_HANDLE_REQU
 public class CaseLogService {
     private final CaseLogRepository caseLogRepository;
     private final InquisitionProcessRepository inquisitionProcessRepository;
+    @Autowired
+    private AccusationRecordRepository accusationRecordRepository;
 
     public CaseLogService(CaseLogRepository caseLogRepository,
                           InquisitionProcessRepository inquisitionProcessRepository) {
@@ -29,29 +38,29 @@ public class CaseLogService {
         this.inquisitionProcessRepository = inquisitionProcessRepository;
     }
 
-    public Payload sendToDiscussion(CaseInput input) {
+    public Payload sendToDiscussion(CaseIdContainer input) {
         caseLogRepository.sendToDiscussion(input.getId());
         return new BasePayload(200, "Sent");
     }
 
-    public Payload finishDiscussion(CaseWithResultInput input) {
-        caseLogRepository.finishProcess(input.getId(), input.getResult(), input.getDescription(),
-                CaseLogStatus.Conversation);
+    public Payload finishDiscussion(CaseWithResultContainer input) {
+        CaseLog caseLog = caseLogRepository.findCurrentByCaseId(input.getId());
+        caseLogRepository.finishCaseLogProcess(caseLog.getId(), input.getResult(), input.getDescription());
         return new BasePayload(200, "Finished");
     }
 
-    public Payload finishTorture(CaseWithResultInput input) {
-        caseLogRepository.finishProcess(input.getId(), input.getResult(), input.getDescription(),
-                CaseLogStatus.Torture);
+    public Payload finishTorture(CaseWithResultContainer input) {
+        CaseLog caseLog = caseLogRepository.findCurrentByCaseId(input.getId());
+        caseLogRepository.finishCaseLogProcess(caseLog.getId(), input.getResult(), input.getDescription());
         return new BasePayload(200, "Finished");
     }
 
-    public Payload sendToTorture(CaseInput input) {
+    public Payload sendToTorture(CaseIdContainer input) {
         caseLogRepository.sendToTorture(input.getId());
         return new BasePayload(200, "Sent");
     }
 
-    public Payload makeTortureStep(CaseWithStepInput input) {
+    public Payload makeTortureStep(CaseWithStepContainer input) {
         caseLogRepository.makeTortureStep(input.getId(), input.getStep());
         return new BasePayload(200, "Made");
     }
@@ -77,6 +86,46 @@ public class CaseLogService {
         if (caseLogs == null) {
             return new BasePayload(400, ERROR_WHILE_HANDLE_REQUEST);
         }
-        return new PayloadWithCollection<>(200, caseLogs);
+
+        List<Integer> recordIds = caseLogs.stream().map(c -> c.getAccusationRecord().getId()).toList();
+        QueryFetchHelper<List<Integer>, List<AccusationRecordComplex>> helperRecord = new QueryFetchHelper<>(
+                recordIds,
+                accusationRecordRepository::findById
+        );
+
+        List<AccusationRecordComplex> recordComplexes = helperRecord.fetch().getFirst();
+        if (recordComplexes == null) {
+            return new BasePayload(400, ERROR_WHILE_HANDLE_REQUEST);
+        }
+
+        Map<Integer, AccusationRecordComplex> recordById = recordComplexes.stream()
+                .collect(Collectors.toMap(AccusationRecordComplex::getId, Function.identity()));
+        List<CaseLogForProcessPayload> payload = caseLogs.stream()
+                .map(c -> {
+                            AccusationRecordComplex record = recordById.get(c.getAccusationRecord().getId());
+                            return convertToPayload(record);
+                        }
+                )
+                .toList();
+        return new PayloadWithCollection<>(200, payload);
+    }
+
+    private CaseLogForProcessPayload convertToPayload(AccusationRecordComplex recordComplex) {
+        String informer = recordComplex.getInformer().getName() + " " + recordComplex.getInformer().getSurname();
+        String bishop = recordComplex.getBishop().getName() + " " + recordComplex.getBishop().getSurname();
+        String accused = recordComplex.getAccused().getName() + " " + recordComplex.getAccused().getSurname();
+        String violationPlace = recordComplex.getViolationPlace();
+        LocalDate dateTime = recordComplex.getViolationTime();
+        String description = recordComplex.getDescription();
+
+        CaseLogForProcessPayload payload = new CaseLogForProcessPayload();
+        payload.setInformer(informer);
+        payload.setBishop(bishop);
+        payload.setAccused(accused);
+        payload.setViolationPlace(violationPlace);
+        payload.setDateTime(dateTime);
+        payload.setDescription(description);
+
+        return payload;
     }
 }

@@ -1,7 +1,7 @@
 package com.inquisition.inquisition.mapper.official;
 
-import com.inquisition.inquisition.model.official.Official;
-import com.inquisition.inquisition.model.official.OfficialName;
+import com.inquisition.inquisition.model.official.entity.Official;
+import com.inquisition.inquisition.model.official.entity.OfficialName;
 import org.jooq.Record;
 import org.springframework.stereotype.Component;
 

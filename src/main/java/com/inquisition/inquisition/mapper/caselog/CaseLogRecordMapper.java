@@ -1,6 +1,6 @@
 package com.inquisition.inquisition.mapper.caselog;
 
-import com.inquisition.inquisition.model.cases.CaseLog;
+import com.inquisition.inquisition.model.cases.entity.CaseLog;
 import org.jooq.Record;
 import org.springframework.stereotype.Component;
 

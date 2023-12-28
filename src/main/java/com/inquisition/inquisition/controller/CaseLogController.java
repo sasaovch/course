@@ -1,8 +1,8 @@
 package com.inquisition.inquisition.controller;
 
-import com.inquisition.inquisition.model.cases.CaseInput;
-import com.inquisition.inquisition.model.cases.CaseWithResultInput;
-import com.inquisition.inquisition.model.cases.CaseWithStepInput;
+import com.inquisition.inquisition.model.cases.container.CaseIdContainer;
+import com.inquisition.inquisition.model.cases.container.CaseWithResultContainer;
+import com.inquisition.inquisition.model.cases.container.CaseWithStepContainer;
 import com.inquisition.inquisition.model.payload.Payload;
 import com.inquisition.inquisition.service.CaseLogService;
 import org.springframework.http.MediaType;
@@ -31,41 +31,45 @@ public class CaseLogController {
     }
 
     @PostMapping("/sendToDiscussion")
-    public ResponseEntity<Payload> sendToDiscussion(@RequestBody CaseInput input) {
+    public ResponseEntity<Payload> sendToDiscussion(@RequestBody CaseIdContainer input) {
         return ResponseEntity.ok(caseLogService.sendToDiscussion(input));
     }
 
     @PostMapping("/finishDiscussion")
-    public ResponseEntity<Payload> finishDiscussion(@RequestBody CaseWithResultInput input) {
+    @PreAuthorize("hasAnyAuthority('BISHOP')")
+    public ResponseEntity<Payload> finishDiscussion(@RequestBody CaseWithResultContainer input) {
         return ResponseEntity.ok(caseLogService.finishDiscussion(input));
     }
 
     @PostMapping("/sendToTorture")
-    public ResponseEntity<Payload> sendToTorture(@RequestBody CaseInput input) {
+    public ResponseEntity<Payload> sendToTorture(@RequestBody CaseIdContainer input) {
         return ResponseEntity.ok(caseLogService.sendToTorture(input));
     }
 
     @PostMapping("/makeTortureStep")
-    public ResponseEntity<Payload> makeTortureStep(@RequestBody CaseWithStepInput input) {
+    public ResponseEntity<Payload> makeTortureStep(@RequestBody CaseWithStepContainer input) {
         return ResponseEntity.ok(caseLogService.makeTortureStep(input));
     }
 
     @PostMapping("/finishTorture")
-    public ResponseEntity<Payload> finishTorture(@RequestBody CaseWithResultInput input) {
+    public ResponseEntity<Payload> finishTorture(@RequestBody CaseWithResultContainer input) {
         return ResponseEntity.ok(caseLogService.finishTorture(input));
     }
 
     @GetMapping("/forDiscussion/{inquisition_id}")
+    @PreAuthorize("hasAnyAuthority('INQUISITOR', 'BISHOP')")
     public ResponseEntity<Payload> getCasesForDiscussion(@PathVariable("inquisition_id") Integer inquisitionId) {
         return ResponseEntity.ok(caseLogService.getCasesForDiscussion(inquisitionId));
     }
 
     @GetMapping("/forTorture/{inquisition_id}")
+    @PreAuthorize("hasAnyAuthority('INQUISITOR', 'SECULAR_AUTHORITY')")
     public ResponseEntity<Payload> getCasesForTorture(@PathVariable("inquisition_id") Integer inquisitionId) {
         return ResponseEntity.ok(caseLogService.getCasesForTorture(inquisitionId));
     }
 
     @GetMapping("/forPunishment/{inquisition_id}")
+    @PreAuthorize("hasAnyAuthority('INQUISITOR', 'SECULAR_AUTHORITY')")
     public ResponseEntity<Payload> getCasesForPunishment(@PathVariable("inquisition_id") Integer inquisitionId) {
         return ResponseEntity.ok(caseLogService.getCasesForPunishment(inquisitionId));
     }

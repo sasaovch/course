@@ -2,10 +2,10 @@ package com.inquisition.inquisition.mapper.caselog;
 
 import com.inquisition.inquisition.mapper.accusation.AccusationRecordMapper;
 import com.inquisition.inquisition.mapper.investigativecase.InvestigativeCaseRecordMapper;
-import com.inquisition.inquisition.model.accusation.AccusationRecord;
-import com.inquisition.inquisition.model.cases.CaseLog;
-import com.inquisition.inquisition.model.cases.InquisitionCaseLog;
-import com.inquisition.inquisition.model.cases.InvestigativeCase;
+import com.inquisition.inquisition.model.accusation.entity.AccusationRecord;
+import com.inquisition.inquisition.model.cases.entity.CaseLog;
+import com.inquisition.inquisition.model.cases.entity.InquisitionCaseLog;
+import com.inquisition.inquisition.model.investigativecase.entity.InvestigativeCase;
 import org.jooq.Record;
 import org.springframework.stereotype.Component;
 

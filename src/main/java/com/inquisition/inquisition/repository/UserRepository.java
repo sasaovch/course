@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.inquisition.inquisition.mapper.user.UserRecordMapper;
 import com.inquisition.inquisition.mapper.user.UserRecordUnmapper;
-import com.inquisition.inquisition.model.user.User;
+import com.inquisition.inquisition.model.user.entity.User;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;

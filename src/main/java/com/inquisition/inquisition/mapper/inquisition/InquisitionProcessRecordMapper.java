@@ -8,18 +8,17 @@ import com.inquisition.inquisition.mapper.church.ChurchRecordMapper;
 import com.inquisition.inquisition.mapper.locality.LocalityRecordMapper;
 import com.inquisition.inquisition.mapper.official.OfficialRecordMapper;
 import com.inquisition.inquisition.mapper.person.PersonRecordMapper;
-import com.inquisition.inquisition.model.accusation.AccusationProcess;
-import com.inquisition.inquisition.model.bible.Bible;
-import com.inquisition.inquisition.model.church.Church;
-import com.inquisition.inquisition.model.inquisition.InquisitionProcess;
-import com.inquisition.inquisition.model.locality.Locality;
-import com.inquisition.inquisition.model.official.Official;
-import com.inquisition.inquisition.model.person.Person;
+import com.inquisition.inquisition.model.accusation.entity.AccusationProcess;
+import com.inquisition.inquisition.model.bible.entity.Bible;
+import com.inquisition.inquisition.model.church.entity.Church;
+import com.inquisition.inquisition.model.inquisition.entity.InquisitionProcess;
+import com.inquisition.inquisition.model.locality.entity.Locality;
+import com.inquisition.inquisition.model.official.entity.Official;
+import com.inquisition.inquisition.model.person.entity.Person;
 import org.jooq.Record;
 import org.springframework.stereotype.Component;
 
 import static com.inquisition.inquisition.utils.TableAliases.INQUISITION_PROCESS_TABLE;
-import static com.inquisition.inquisition.utils.TableAliases.PERSON_TABLE;
 
 @Component
 public class InquisitionProcessRecordMapper {
@@ -71,32 +70,11 @@ public class InquisitionProcessRecordMapper {
     }
 
     public InquisitionProcess mapInquisitionProcessWithPerson(Record record) {
-        InquisitionProcess process = new InquisitionProcess();
-        Integer id = record.get(INQUISITION_PROCESS_TABLE.ID);
-        LocalDate startDate =
-                record.get(INQUISITION_PROCESS_TABLE.START_DATA);
-        LocalDate finishDate =
-                record.get(INQUISITION_PROCESS_TABLE.FINISH_DATA);
-
-        process.setId(id);
-        process.setStartData(startDate);
-        process.setFinishData(finishDate);
-
-        AccusationProcess accusationProcess = accusationRecordMapper.mapAccusationProcess(record);
-        Church church = churchRecordMapper.mapChurch(record);
-        Locality locality = localityRecordMapper.mapLocality(record);
-        Official official = officialRecordMapper.mapOfficial(record);
-        Bible bible = bibleRecordMapper.mapBible(record);
-
-        process.setAccusationProcess(accusationProcess);
-        church.setLocality(locality);
-        process.setChurch(church);
-        process.setBible(bible);
+        InquisitionProcess process = mapInquisitionProcess(record);
 
         Person person = personRecordMapper.mapPerson(record);
-        official.setPerson(person);
+        process.getOfficial().setPerson(person);
 
-        process.setOfficial(official);
         return process;
     }
 }

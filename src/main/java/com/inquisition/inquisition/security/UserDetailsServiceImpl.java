@@ -1,11 +1,7 @@
 package com.inquisition.inquisition.security;
 
-import java.util.Optional;
-
-import com.inquisition.inquisition.jwt.JwtUtils;
-import com.inquisition.inquisition.model.official.Official;
-import com.inquisition.inquisition.model.user.User;
-import com.inquisition.inquisition.model.user.UserRole;
+import com.inquisition.inquisition.model.official.entity.Official;
+import com.inquisition.inquisition.model.user.entity.User;
 import com.inquisition.inquisition.repository.OfficialRepository;
 import com.inquisition.inquisition.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import static com.inquisition.inquisition.utils.UserConverter.getRoleByOfficial;
 

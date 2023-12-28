@@ -3,8 +3,8 @@ package com.inquisition.inquisition.repository;
 import java.util.List;
 
 import com.inquisition.inquisition.mapper.bible.BibleRecordMapper;
-import com.inquisition.inquisition.model.bible.Bible;
-import com.inquisition.inquisition.model.bible.Commandment;
+import com.inquisition.inquisition.model.bible.entity.Bible;
+import com.inquisition.inquisition.model.commandment.entity.Commandment;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;

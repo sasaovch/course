@@ -1,9 +1,9 @@
 package com.inquisition.inquisition.utils;
 
-import com.inquisition.inquisition.model.official.Official;
-import com.inquisition.inquisition.model.user.User;
-import com.inquisition.inquisition.model.user.LoginedUser;
-import com.inquisition.inquisition.model.user.UserRole;
+import com.inquisition.inquisition.model.official.entity.Official;
+import com.inquisition.inquisition.model.user.entity.User;
+import com.inquisition.inquisition.model.user.entity.LoginedUser;
+import com.inquisition.inquisition.model.user.entity.UserRole;
 import com.inquisition.inquisition.security.UserDetailsImpl;
 
 public final class UserConverter {

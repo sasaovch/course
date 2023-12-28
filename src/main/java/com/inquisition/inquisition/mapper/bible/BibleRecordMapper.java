@@ -1,6 +1,6 @@
 package com.inquisition.inquisition.mapper.bible;
 
-import com.inquisition.inquisition.model.bible.Bible;
+import com.inquisition.inquisition.model.bible.entity.Bible;
 import org.jooq.Record;
 import org.springframework.stereotype.Component;
 

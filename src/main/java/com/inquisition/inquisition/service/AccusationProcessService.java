@@ -4,20 +4,20 @@ import java.util.List;
 import java.util.function.Function;
 
 import com.inquisition.inquisition.Pair;
-import com.inquisition.inquisition.model.accusation.AccusationProcess;
-import com.inquisition.inquisition.model.accusation.AccusationProcessWithIdContainer;
-import com.inquisition.inquisition.model.accusation.AccusationProcessWithInqProcessId;
-import com.inquisition.inquisition.model.accusation.AccusationRecordFull;
-import com.inquisition.inquisition.model.accusation.AccusationRecordPayload;
-import com.inquisition.inquisition.model.accusation.AddAccusationRecordContainer;
-import com.inquisition.inquisition.model.accusation.ConnectCommandmentContainer;
+import com.inquisition.inquisition.model.accusation.container.AccusationProcessWithIdContainer;
+import com.inquisition.inquisition.model.accusation.container.AccusationProcessWithInqProcessId;
+import com.inquisition.inquisition.model.accusation.container.AddAccusationRecordContainer;
+import com.inquisition.inquisition.model.accusation.entity.AccusationProcess;
+import com.inquisition.inquisition.model.accusation.entity.AccusationRecordComplex;
+import com.inquisition.inquisition.model.accusation.payload.AccusationRecordPayload;
+import com.inquisition.inquisition.model.commandment.container.ConnectCommandmentContainer;
 import com.inquisition.inquisition.model.payload.BasePayload;
 import com.inquisition.inquisition.model.payload.Payload;
 import com.inquisition.inquisition.model.payload.PayloadWithCollection;
 import com.inquisition.inquisition.model.payload.PayloadWithInteger;
 import com.inquisition.inquisition.repository.AccusationProcessRepository;
 import com.inquisition.inquisition.repository.AccusationRecordRepository;
-import com.inquisition.inquisition.repository.QueryFetchHelper;
+import com.inquisition.inquisition.repository.helper.QueryFetchHelper;
 import com.inquisition.inquisition.utils.AccusationRecordConverter;
 import org.jooq.exception.DataAccessException;
 import org.slf4j.Logger;
@@ -41,32 +41,36 @@ public class AccusationProcessService {
     }
 
     public Payload startProcess(AccusationProcessWithInqProcessId container) {
-        try {
-            //FIXME
-            // : по хорошему сделать валидацию, что нельзя начать дважды процесс
-            Integer processId = accusationProcessRepository.startAccusationProcess(container.getInquisitionProcessId());
-            return new PayloadWithInteger(200, "Процесс сбора доносов начат.", processId);
-
-        } catch (DataIntegrityViolationException | DataAccessException e) {
-            logger.debug("Incorrect request AccusationProcessService:startProcess: {}", container);
-            return new BasePayload(400, ERROR_WHILE_HANDLE_REQUEST);
+        AccusationProcess process =
+                accusationProcessRepository.findByInquisitionProcess(container.getInquisitionProcessId());
+        if (process != null) {
+            return new BasePayload(400, "Процесс сбора доносов уже начат");
         }
+
+        QueryFetchHelper<Integer, Integer> helper = new QueryFetchHelper<>(
+                container.getInquisitionProcessId(), accusationProcessRepository::startAccusationProcess
+        );
+        Pair<Integer, String> pair = helper.fetch();
+        if (pair.getFirst() == null) {
+            return new BasePayload(400, pair.getSecond());
+        }
+        return new PayloadWithInteger(200, "Начался процесс сбора доносов", pair.getFirst());
     }
 
     public Payload finishProcess(AccusationProcessWithIdContainer container) {
         AccusationProcess process = accusationProcessRepository.find(container.getAccusationId());
         if (process == null) {
-            return new BasePayload(404, "Такой процесс сбора доносов не найден.");
+            return new BasePayload(404, "Процесс сбора доносов не найден.");
         }
 
-        try {
-            accusationProcessRepository.finishAccusationProcess(container.getAccusationId());
-            return new BasePayload(200, "Процесс сбора доносов закончен.");
-
-        } catch (DataIntegrityViolationException | DataAccessException e) {
-            logger.debug("Incorrect request AccusationProcessService:finishProcess: {}", container);
-            return new BasePayload(400, ERROR_WHILE_HANDLE_REQUEST);
+        QueryFetchHelper<Integer, Void> helper = new QueryFetchHelper<>(
+                container.getAccusationId(), accusationProcessRepository::finishAccusationProcess
+        );
+        Pair<Void, String> pair = helper.fetch();
+        if (pair.getSecond() != null) {
+            return new BasePayload(400, pair.getSecond());
         }
+        return new BasePayload(200, "Процесс сбора доносов закончен.");
     }
 
     public Payload generateCases(AccusationProcessWithIdContainer container) {
@@ -90,7 +94,7 @@ public class AccusationProcessService {
     public Payload getNotResolvedAccusationRecord(Integer accusationId) {
         return getAccusationProcessWrapper(
                 accusationId,
-                accusationRecordRepository::getNotResolvedAccusationRecordWithSubFields
+                accusationRecordRepository::getNotResolvedAccusationRecordComplex
         );
     }
 
@@ -102,7 +106,7 @@ public class AccusationProcessService {
     }
 
     private Payload getAccusationProcessWrapper(Integer accusationId,
-                                                Function<Integer, List<AccusationRecordFull>> sqlRequest) {
+                                                Function<Integer, List<AccusationRecordComplex>> sqlRequest) {
         if (accusationId == null) {
             return new BasePayload(400, "Процесс id не может быть null");
         }
@@ -110,12 +114,12 @@ public class AccusationProcessService {
         if (process == null) {
             return new BasePayload(400, "Процесс с id " + accusationId + " не найден");
         }
-        QueryFetchHelper<Integer, List<AccusationRecordFull>> helper = new QueryFetchHelper<>(
+        QueryFetchHelper<Integer, List<AccusationRecordComplex>> helper = new QueryFetchHelper<>(
                 accusationId,
                 sqlRequest
         );
-        Pair<List<AccusationRecordFull>, String> pair = helper.fetch();
-        List<AccusationRecordFull> records = pair.getFirst();
+        Pair<List<AccusationRecordComplex>, String> pair = helper.fetch();
+        List<AccusationRecordComplex> records = pair.getFirst();
         if (records == null) {
             return new BasePayload(400, ERROR_WHILE_HANDLE_REQUEST);
         }

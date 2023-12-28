@@ -1,7 +1,7 @@
 package com.inquisition.inquisition.mapper.accusation;
 
-import com.inquisition.inquisition.model.accusation.AccusationProcess;
-import com.inquisition.inquisition.model.accusation.AccusationRecord;
+import com.inquisition.inquisition.model.accusation.entity.AccusationProcess;
+import com.inquisition.inquisition.model.accusation.entity.AccusationRecord;
 import com.inquisition.inquisition.models.tables.GetNotResolvedAccusationRecord;
 import org.jooq.Record;
 import org.springframework.stereotype.Component;

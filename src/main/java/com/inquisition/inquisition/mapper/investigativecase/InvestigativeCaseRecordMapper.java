@@ -1,6 +1,6 @@
 package com.inquisition.inquisition.mapper.investigativecase;
 
-import com.inquisition.inquisition.model.cases.InvestigativeCase;
+import com.inquisition.inquisition.model.investigativecase.entity.InvestigativeCase;
 import org.jooq.Record;
 import org.springframework.stereotype.Component;
 

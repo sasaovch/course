@@ -4,8 +4,8 @@ import java.util.List;
 
 import com.inquisition.inquisition.mapper.caselog.InquisitionCaseLogRecordMapper;
 import com.inquisition.inquisition.mapper.inquisition.InquisitionProcessRecordMapper;
-import com.inquisition.inquisition.model.cases.InquisitionCaseLog;
-import com.inquisition.inquisition.model.inquisition.InquisitionProcess;
+import com.inquisition.inquisition.model.cases.entity.InquisitionCaseLog;
+import com.inquisition.inquisition.model.inquisition.entity.InquisitionProcess;
 import com.inquisition.inquisition.models.enums.CaseLogStatus;
 import com.inquisition.inquisition.models.routines.FinishInquisitionProcess;
 import com.inquisition.inquisition.models.routines.StartInquisitionProcess;
@@ -75,12 +75,22 @@ public class InquisitionProcessRepository {
                 .map(inquisitionProcessRecordMapper::mapInquisitionProcess);
     }
 
+//    @Transactional(readOnly = true)
+//    public boolean existProcess(Integer processId) {
+//        return dsl.selectFrom(INQUISITION_PROCESS_TABLE)
+//                .where(INQUISITION_PROCESS_TABLE.ID.eq(processId))
+//                .fetchOptional()
+//                .isPresent();
+//    }
+
     @Transactional(readOnly = true)
-    public boolean existProcess(Integer processId) {
-        return dsl.selectFrom(INQUISITION_PROCESS_TABLE)
-                .where(INQUISITION_PROCESS_TABLE.ID.eq(processId))
-                .fetchOptional()
-                .isPresent();
+    //FIXME: think about this
+    public List<InquisitionCaseLog> getCases(List<Integer> caseIds) {
+        return getCaseForCondition(
+                DSL.condition(INVESTIGATIVE_CASE_TABLE.ID.in(caseIds))
+//                DSL.trueCondition()
+        );
+//                .and(CASE_LOG_TABLE.RESULT.isNull()));
     }
 
     @Transactional(readOnly = true)
@@ -117,7 +127,7 @@ public class InquisitionProcessRepository {
                 .join(INVESTIGATIVE_CASE_TABLE)
                 .on(INVESTIGATIVE_CASE_TABLE.ID.eq(ACCUSATION_INVESTIGATIVE_CASE_TABLE.CASE_ID))
 
-                .join(CASE_LOG_TABLE)
+                .leftJoin(CASE_LOG_TABLE)
                 .on(CASE_LOG_TABLE.CASE_ID.eq(INVESTIGATIVE_CASE_TABLE.ID))
 
                 .where(condition)

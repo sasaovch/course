@@ -1,12 +1,10 @@
 package com.inquisition.inquisition.utils;
 
-import com.inquisition.inquisition.model.accusation.AccusationRecord;
-import com.inquisition.inquisition.model.accusation.AccusationRecordFull;
-import com.inquisition.inquisition.model.accusation.AccusationRecordPayload;
-import com.inquisition.inquisition.model.accusation.AccusationRecordWithCasePayload;
+import com.inquisition.inquisition.model.accusation.entity.AccusationRecordComplex;
+import com.inquisition.inquisition.model.accusation.payload.AccusationRecordPayload;
 
 public class AccusationRecordConverter {
-    public static AccusationRecordPayload convertToPayload(AccusationRecordFull record) {
+    public static AccusationRecordPayload convertToPayload(AccusationRecordComplex record) {
         AccusationRecordPayload payload = new AccusationRecordPayload();
 
         payload.setId(record.getId());

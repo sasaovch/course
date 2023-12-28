@@ -1,8 +1,8 @@
 package com.inquisition.inquisition.controller;
 
 import com.inquisition.inquisition.model.payload.Payload;
-import com.inquisition.inquisition.model.user.LoginUser;
-import com.inquisition.inquisition.model.user.SignupUser;
+import com.inquisition.inquisition.model.user.container.LoginUser;
+import com.inquisition.inquisition.model.user.container.SignupUser;
 import com.inquisition.inquisition.service.AuthenticationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
 package com.inquisition.inquisition.mapper.locality;
 
-import com.inquisition.inquisition.model.locality.Locality;
+import com.inquisition.inquisition.model.locality.entity.Locality;
 import org.jooq.Record;
 import org.springframework.stereotype.Component;
 
