@@ -32,7 +32,7 @@ public class RedirectFilterConfiguration {
     private OncePerRequestFilter createRedirectFilter() {
         return new OncePerRequestFilter() {
             // Forwards all routes except '/index.html', '/200.html', '/favicon.ico', '/sw.js' '/api/', '/api/**'
-            private static final String REGEX = "(/accusations|/auth|/bibles|/cases|/index\\.html|/inquisitions|/localities|/persons|.*js|.*css|.*ttf|.*woff|.*woff2|.*eot|.*jpg|.*png|.*svg|.*ico).*$";
+            private static final String REGEX = "(/my-web-socket|/gs-guide-websocket|/ws|/accusations|/auth|/bibles|/cases|/index\\.html|/inquisitions|/localities|/persons|.*js|.*css|.*ttf|.*woff|.*woff2|.*eot|.*jpg|.*png|.*svg|.*ico).*$";
             private final Pattern pattern = Pattern.compile(REGEX);
             @Override
             protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
